@@ -143,32 +143,28 @@ mycol = c("bisque4", "deeppink", "chartreuse4","blue","coral3","goldenrod","deep
 
 
 
-#Load data (ASV table, taxonomy & tree, & metadata)
+#Load data (ASV table, taxonomy & tree, & metadata_bac)
 ```{r,echo = F}
 ##Imported feature table
-asv_tab <- read.table("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Table.txt", 
+asv_tab_bac <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Bacteria_Table.txt", 
               header=TRUE,
-              row.names="OTUID");asv_tab
-asv_tab <- otu_table(asv_tab, taxa_are_rows = TRUE);asv_tab 
+              row.names="OTUID");asv_tab_bac
+asv_tab_bac <- otu_table(asv_tab_bac, taxa_are_rows = TRUE);asv_tab_bac 
 
 ## Imported taxonomy table
-tax_tab <- read.table("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Taxonomy.txt", 
+tax_tab_bac <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Bacteria_Taxonomy.txt", 
               header=TRUE,
               sep="\t",
-              row.names="OTUID");tax_tab
-tax_tab <- as.matrix(tax_tab);tax_tab
-tax_tab <- tax_table(tax_tab);tax_tab
+              row.names="OTUID");tax_tab_bac
+tax_tab_bac <- as.matrix(tax_tab_bac);tax_tab_bac
+tax_tab_bac <- tax_table(tax_tab_bac);tax_tab_bac
 
-## Imported metadata file
-metadata <- read.csv("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Metadata.csv",
+## Imported metadata_bac file
+metadata_bac <- read.csv("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Bacteria_Metadata.csv",
               header=TRUE,
-              row.names="SampleID");metadata
-#rownames(metadata) <- metadata[,1]
-metadata <- sample_data(metadata);metadata
-
-#import rooted tree
-rtree <- read.tree(file = "/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/tree.nwk");rtree
-tree <- phy_tree(rtree)
+              row.names="SampleID");metadata_bac
+#rownames(metadata_bac) <- metadata_bac[,1]
+metadata_bac <- sample_data(metadata_bac);metadata_bac
 
 #import reference sequences
 ## Import reference sequences
@@ -182,42 +178,212 @@ tree <- phy_tree(rtree)
 #   with.qualities = F)
 
 #proof that the data are of equal dimensions
-all(rownames(metadata) %in% colnames(asv_tab))
+all(rownames(metadata_bac) %in% colnames(asv_tab_bac))
 
 #Convert to phyloseq object
-ps <- merge_phyloseq(
-  asv_tab,
-  tax_tab, 
-  metadata,
-  tree);ps#[ 16460 taxa & 1197 samples ]
-summarize_phyloseq(ps)
-ps0 <- ps # 16460 taxa & 1197 samples
-save(ps0,
-file = "/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/ps0.RData")
+ps_Bacteria <- merge_phyloseq(
+  asv_tab_bac,
+  tax_tab_bac, 
+  metadata_bac);ps_Bacteria#[ 16460 taxa & 1197 samples ]
+summarize_phyloseq(ps_Bacteria)
+ps0_Bacteria <- ps_Bacteria # 16460 taxa & 1197 samples
+save(ps0_Bacteria,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Bacteria.RData")
 
 ```
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+#clean the data
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Bacteria.RData")
+
+ps_clean_Bacteria = subset_taxa(ps0_Bacteria, Kingdom=="Bacteria");ps_clean_Bacteria# [ 6448 taxa & 84 samples ]
+ps_clean_Bacteria = subset_taxa(ps_clean_Bacteria, Phylum!="Cyanobacteria");ps_clean_Bacteria#  [ 15588 taxa & 1197 samples ]
+ps_clean_Bacteria = subset_taxa(ps_clean_Bacteria, Order!="Chloroplast");ps_clean_Bacteria#  [ 15588 taxa & 1197 samples ]
+ps_clean_Bacteria = subset_taxa(ps_clean_Bacteria, Family!="Mitochondria");ps_clean_Bacteria# [ 15588 taxa & 1197 samples ]
+ps_clean_Bacteria <- prune_taxa(taxa_sums(ps_clean_Bacteria)>0, ps_clean_Bacteria);ps_clean_Bacteria# [ 15588 taxa & 1197 samples ]
+
+ps1_Bacteria <- ps_clean_Bacteria
+
+sort(sample_sums(ps1_Bacteria))
+summary(sample_sums(ps1_Bacteria)) # mean reads/sample = 22791
+summarize_phyloseq(ps1_Bacteria) # Average reads = 22791, Total reads = 27281011, Singletons = 38
+taxa_names(ps1_Bacteria)[1:5]
+sample_data(ps1_Bacteria)$total_reads <- sample_sums(ps1_Bacteria)
+
+save(ps1_Bacteria, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Bacteria.RData")
+
+K <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Kingdom"]));K
+P <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Phylum"]));P # 38 phyla
+C <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Class"]));C # 109 classes
+O <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Order"]));O # 261 orders
+Fa <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Family"]));Fa # 476 families
+G <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Genus"]));G # 1187 genera
+#S <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Species"]));S # 1264 species
+
+microbiome::summarize_phyloseq(ps1_Bacteria)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+# Total number of reads = 27281011"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+taxonomy <- as.vector(phyloseq::tax_table(ps1_Bacteria))
+sums_ps1_Bacteria <- sample_sums(ps1_Bacteria);sums_ps1_Bacteria
+sums_ps1_Bacteria <- data.frame(sums_ps1_Bacteria);sums_ps1_Bacteria
+sums_ps1_Bacteria <- as.matrix(sums_ps1_Bacteria);sums_ps1_Bacteria
+colSums(sums_ps1_Bacteria) #  27281011      
+max(sums_ps1_Bacteria) #225892
+min(sums_ps1_Bacteria) # 68
+sums_ps1_Bacteria
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+#Filter data at 0.025 prevalence
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+#Obtained from: https://f1000research.com/articles/5-1492/v1;#One of the reasons to filter by prevalence is to avoid spending #much time analyzing taxa that were only rarely seen. This also turns out to be a useful filter of noise (taxa that are #actually just artifacts of the data collection process)
+# Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
 
-```{r cars}
-summary(cars)
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Bacteria.RData")
+
+prev0 = apply(X = otu_table(ps1_Bacteria),
+              MARGIN = ifelse(taxa_are_rows(ps1_Bacteria), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)})
+
+prevdf = data.frame(Prevalence = prev0,
+                    TotalAbundance = taxa_sums(ps1_Bacteria),
+                    tax_table(ps1_Bacteria))# the most prevalent ASVs present therein the composition
+
+#only for reference, in case we want to filter Phyla that appear less than X times
+keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 0)]
+
+prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
+
+# Define prevalence threshold as 0.25% of total samples# 
+prevalenceThreshold = 0.0025 * nsamples(ps1_Bacteria)
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps2_Bacteria_Bacteria = prune_taxa((prev0 > prevalenceThreshold), ps1_Bacteria);ps2_Bacteria_Bacteria
+
+# Filter entries with unidentified Phylum.
+ps3_Bacteria = subset_taxa(ps2_Bacteria_Bacteria, Phylum %in% names(keepPhyla));ps3_Bacteria
+
+#Plot prevalence of different phyla
+#https://github.com/joey711/phyloseq/issues/1474
+
+ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 2, alpha = 0.65) +
+  scale_y_log10() + scale_x_log10() +
+  ggtitle(paste0("Prevalence filtering, using a threshold of ", prevalenceThreshold))+
+  xlab("Total Abundance") +
+  scale_color_manual(values=ocean.balance(38))+
+  theme_bw()+
+  facet_wrap(~Phylum, nrow = 4)
+
+print(paste0("Initial #ASVs:", ntaxa(ps1_Bacteria), ". #ASVs after prevalence filtering:", ntaxa(ps3_Bacteria), ". #ASVs removed: ", ntaxa(ps1_Bacteria)-ntaxa(ps3_Bacteria)))
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+# Save the bacterial object
+```{r}
+save(ps3_Bacteria, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+##plot rarefaction curves  for the bacterial community
+#code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
+```{r, echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+library(microbiomeutilities)
+# set seed
+set.seed(1)
+subsamples <- seq(0, 50000, by=500)[-1]
+#subsamples = c(10, 5000, 10000, 20000, 30000)
+
+Rareaction_Bacteria <- plot_alpha_rcurve(ps3_Bacteria, index="observed",
+            subsamples = subsamples,
+            lower.conf = 0.025, 
+            upper.conf = 0.975,
+            group="Genotype",
+            label.color = "brown3",
+            label.size = 3,
+            label.min = TRUE);Rareaction_Bacteria
+
+Rareaction_Bacteria <- Rareaction_Bacteria + scale_color_manual(values = mycola) + 
+  scale_fill_manual(values = mycola)+ 
+  theme(axis.text=element_text(size=8), panel.grid=element_blank(),
+        strip.background = element_rect(colour=NA,fill="grey33"),
+        strip.text.x = element_text(face="bold"))+
+  theme(text=element_text(size=14,  family="sans"))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
+  theme(legend.position="none")+
+  labs(tag = "")
+print(Rareaction_Bacteria)
+
+tiff("p.tiff", units="in", width=12, height=5, res=300)
+ggsave("p.TIFF", plot = Rareaction_Bacteria)
+
+```
+
+#Transformed to relative abundances 
+#bar blot of the seed microbiome composition in the different cukltivars at the various locations for the top500 ASVs
+
+```{r,echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+
+# Bar plots:
+##Showing individual replicates. Top 500 taxa
+toptax = names(sort(taxa_sums(ps3_Bacteria), decreasing=TRUE))[1:500];toptax
+ps.toptax_Bacteria = transform_sample_counts(ps3_Bacteria, function(x) {x/sum(x)*100});ps.toptax_Bacteria
+ps.toptax_Bacteria <- prune_taxa(toptax, ps.toptax_Bacteria);ps.toptax_Bacteria
+
+#Class level
+psmelt(ps.toptax_Bacteria)
+gg1=ggplot(psmelt(ps.toptax_Bacteria), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Class))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  scale_fill_manual(values=c("grey35","chartreuse4","#FE7F9D","darkturquoise", "#F0E442","#009E73","#FF0000",
+         "Orange","blue","#850dba","green1","#FF6AD5","#6A3D9A","Yellow","Blue",
+         "deeppink","#1C0221","#00AFBB","steelblue","#D16103","#25725d", "#439b5b", "#7bc369", "#abd69a", "#d8e8b0", "#cccda7", "#bfb77b", "7e9998", "#92B2B2", "#83bbbf", "#61acc1", "#58a0c4", "#7087c3","#8973b4", "#512972","#56B4E9","#86486F","#446455", "bisque4","#F7B1AB","#807182","#E3DDDD","#56B4E9","#86486F","#446455", "bisque4","#F7B1AB","#807182","#E3DDDD"))+
+  #scale_fill_manual(values = mycola)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Class, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
+
+library(ggpubr)
+tiff("Composition_Genotype.tiff", units="in", width=10, height=6, res=300)
+Composition_Genotype.tiff=gg1+plot_layout(nrow = 1);Composition_Genotype.tiff
+ggsave("Composition_Genotype.tiff", plot = Composition_Genotype.tiff)
+dev.off()
+
+
+#Order level
+psmelt(ps.toptax_Bacteria)
+gg1=ggplot(psmelt(ps.toptax_Bacteria), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Order))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  #scale_fill_manual(values=c("#25725d", "#439b5b", "#7bc369", "#abd69a", "#d8e8b0", "#cccda7", "#bfb77b", "#7e9998", "#92B2B2", "#83bbbf", "#61acc1", "#58a0c4", "#7087c3","#8973b4", "#512972"))+
+  scale_fill_manual(values = mycola)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Order, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
+
+library(ggpubr)
+tiff("Order_Composition_Genotype.tiff", units="in", width=10, height=6, res=300)
+Order_Composition_Genotype.tiff=gg1+plot_layout(nrow = 1);Order_Composition_Genotype.tiff
+ggsave("Order_Composition_Genotype.tiff", plot = Order_Composition_Genotype.tiff)
+dev.off()
+
+```
