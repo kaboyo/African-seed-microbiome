@@ -1,0 +1,11 @@
+.y.,group1,group2,n1,n2,statistic,p,p.adj,p.adj.signif
+Observed,Amaranthus_hybridus,Celosiea_argentea,5,6,3.258802601614751,0.0011188348676459136,0.011188348676459136,*
+Observed,Amaranthus_hybridus,Corchorus_olitorius,5,6,0.7856041986035561,0.4320994039495192,1,ns
+Observed,Amaranthus_hybridus,Solanum_macrocarpon,5,6,2.094944529609483,0.03617592378517798,0.36175923785177977,ns
+Observed,Amaranthus_hybridus,Telfairia_occidentalis,5,6,-1.1703239501830751,0.24187062721901692,1,ns
+Observed,Celosiea_argentea,Corchorus_olitorius,6,6,-2.5939123683584295,0.009489066947223401,0.09489066947223401,ns
+Observed,Celosiea_argentea,Solanum_macrocarpon,6,6,-1.2206646439333786,0.2222130196181277,1,ns
+Observed,Celosiea_argentea,Telfairia_occidentalis,6,6,-4.645307117190913,3.395709095620313e-6,3.3957090956203134e-5,****
+Observed,Corchorus_olitorius,Solanum_macrocarpon,6,6,1.373247724425051,0.1696753478088798,1,ns
+Observed,Corchorus_olitorius,Telfairia_occidentalis,6,6,-2.0513947488324837,0.040228520026645044,0.4022852002664504,ns
+Observed,Solanum_macrocarpon,Telfairia_occidentalis,6,6,-3.4246424732575345,6.156089668515916e-4,0.006156089668515916,**
