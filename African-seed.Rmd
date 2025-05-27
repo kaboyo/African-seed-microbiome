@@ -1,8 +1,202 @@
 ---
-title: "Tosin"
+title: "Olimi"
 output: html_document
 date: "2025-05-27"
 ---
+
+
+microbiome")
+
+#replace this with your working directory
+```{r, echo=F, warning= F}
+setwd("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome")
+library(phyloseq);packageVersion("phyloseq")#‘1.46.0’
+library(vegan);packageVersion("vegan")# ‘2.6.4’
+library(genefilter);packageVersion("genefilter")#‘1.84.0’
+library(psych);packageVersion("psych")#‘2.4.1’
+library(DESeq2);packageVersion("DESeq2")#‘1.42.1’
+library(ggplot2);packageVersion("ggplot2")#‘3.5.0’
+library(reshape2);packageVersion("reshape2")#‘1.4.4’
+library(microbiome);packageVersion("microbiome")#‘1.24.0’
+library(ranacapa);packageVersion("ranacapa")#‘0.1.0’
+library(S4Vectors);packageVersion("S4Vectors")#‘0.40.2’
+library(Biobase);packageVersion("Biobase")#‘2.62.0’
+library(BiocGenerics);packageVersion("BiocGenerics")#‘0.48.1’
+library(parallel);packageVersion("parallel")#‘4.3.2’
+library(ggpubr);packageVersion("ggpubr")#‘0.6.0’
+#library(metagMisc)
+library(decontam);packageVersion("decontam")#‘1.22.0’
+library(RColorBrewer);packageVersion("RColorBrewer")#‘1.1.3’
+library(multcompView);packageVersion("multcompView")#‘0.1.10’
+library(metagenomeSeq);packageVersion("metagenomeSeq")#‘1.43.0’
+#library(devtools)
+library(lawstat);packageVersion("lawstat")#‘3.6’
+library(DirichletMultinomial);packageVersion("DirichletMultinomial")#‘1.44.0’
+library(lattice);packageVersion("lattice")# ‘0.22.5’
+library(xtable);packageVersion("xtable")#‘1.8.4’
+library(permute);packageVersion("permute")#‘0.9.7’
+library(grid);packageVersion("grid")#‘4.3.2’
+library("doParallel");packageVersion("doParallel")#‘1.0.17’
+#library(igraph)
+library(ade4);packageVersion("ade4")#‘1.7.22’
+#library(rgl)
+library(car);packageVersion("car")#‘3.1.2’
+library(gridExtra);packageVersion("gridExtra")# ‘2.3’
+library(tidyverse);packageVersion("tidyverse")#‘2.0.0’
+library(phia);packageVersion("phia")#‘0.3.1’
+library(lme4);packageVersion("lme4")#‘1.1.35.1’
+library(broom);packageVersion("broom")#‘1.0.5’
+library(AICcmodavg);packageVersion("AICcmodavg")#‘2.3.3’
+library(multcomp);packageVersion("multcomp")#‘1.4.25’
+library(rcompanion);packageVersion("rcompanion")#‘2.4.35’
+library(hrbrthemes);packageVersion("hrbrthemes")#‘0.8.7’
+library(viridis);packageVersion("viridis")#‘0.6.5’
+library(ape);packageVersion("ape")#‘5.7.1’#loading the tree
+library(microbiomeutilities);packageVersion("microbiomeutilities")#‘1.0.17’#process taxonomy table
+library(microViz);packageVersion("microViz")#‘0.12.1’#clean taxonomy table to be cited
+library(GUniFrac);packageVersion("GUniFrac")#‘1.8’
+library(ggtext) ;packageVersion("ggtext")# ‘0.1.2’for rotated labels on ord_plot() 
+library(ggraph);packageVersion("ggraph")# ‘2.2.1’for taxatree_plots()
+library(DT);packageVersion("DT")# ‘0.32’for tax_fix_interactive()
+library(corncob);packageVersion("corncob")#‘0.4.1’ for beta binomial models in tax_model()
+library(VennDiagram);packageVersion("VennDiagram")#‘1.7.3’
+library(UpSetR);packageVersion("UpSetR")#‘1.4.0’
+library(rstatix);packageVersion("rstatix")#‘0.7.2’
+library(ALDEx2);packageVersion("ALDEx2")#[1] ‘1.34.0’
+library(cowplot);packageVersion("cowplot")#‘1.1.3’
+library(HMP);packageVersion("HMP")#HMP: Hypothesis Testing & Power Calculations for Comparing Metagenomic Samples from HMP #‘2.0.1’
+library(dendextend);packageVersion("dendextend")#‘1.17.1’
+library(dplyr)
+library(gcookbook)
+library(tidyverse)
+library(patchwork)
+library(MicrobiotaProcess)
+library(rmarkdown)#install.packages("rmarkdown")
+library(dada2)
+library(Biostrings)
+library(ggalluvial)
+library(ggh4x)
+library(tidyverse)
+library(ggrepel)
+library(qiime2R)#https://github.com/jbisanz/qiime2R
+library(dplyr)
+library(pals)
+library(ggforce)
+library(gridExtra)
+library(vegan)
+library(data.table)
+library(picante)
+library(ggtreeExtra)
+library(ggpmisc)
+library(DECIPHER) #BiocManager::install("DECIPHER")
+library(phangorn) #remotes::install_github("KlausVigo/phangorn")
+library(ggtree) #BiocManager::install("ggtree")
+library(plotly)
+library(speedyseq) #remotes::install_github("mikemc/speedyseq")
+library(ComplexHeatmap)
+library(agricolae)
+library(scales)
+library(ggpmisc)
+library(pairwiseAdonis)#library(devtools) install_github("pmartinezarbizu/pairwiseAdonis/pairwiseAdonis")
+#remotes::install_github("mahendra-mariadassou/phyloseq-extended", ref = "dev")
+library(phyloseq.extended)#remotes::install_github(repo = "mahendra-mariadassou/phyloseq-extended@v0.1.0.9000-beta", ref = "dev")
+#The following need to be installed but NOT loaded (same naming of different functions):
+#library(metagMisc) #devtools::install_github("vmikk/metagMisc")
+#library(metagenomeSeq) #BiocManager::install("metagenomeSeq")
+source("Rscript_parwise.adonis.txt")
+source("aggregate_top_taxa.txt")
+source("PD.txt")
+source("aggregate_rare.txt")
+source("plot_composition.txt")
+source("RSCRIPT_parwise.adonis.txt")
+source("plot_hierarchy.R")
+#https://sites.northwestern.edu/researchcomputing/resources/using-git-&-github-with-r-rstudio/#github-r config
+```
+
+
+#Load colors for identifying the different samples
+```{r,echo = F,warning = FALSE}
+mycolors=c("grey35","#00AFBB","goldenrod","#0dba2f","#392682","coral3","#8E9CA3",
+           "chartreuse4","grey85","#FF2700","bisque4","#0B775E","darkred","#F39B7FB2","#FA41CA",
+           "steelblue","blue","#D16103", "#C3D7A4", "#52854C","deepskyblue","#293352","#FFDB6D",
+           "Yellow","#CC79A7","#392682", "#CAB2D6","maroon","orchid1","khaki2","#86486F","#7E6148B2");mycolors
+
+mycola=c("grey35","chartreuse4","#FE7F9D","darkturquoise", "#F0E442","#009E73","#FF0000",
+         "Orange","blue","#850dba","green1","#FF6AD5","#6A3D9A","Yellow","Blue",
+         "deeppink","#1C0221","#00AFBB","steelblue","#D16103", "#C3D7A4","#52854C",
+         "#4E84C4","#293352","#FFDB6D","#CC79A7","#C4961A", "#F4EDCA","dodgerblue2", 
+         "#E31A1C","green4","#0dba2f","black","gold1", "skyblue2","#FB9A99","#CAB2D6",
+         "blue1","steelblue4","Sky Blue","grey85","#3B9AB2","goldenrod","yellow3",
+         "darkorange4","brown","#999999", "#E69F00","#56B4E9","#009E73","#F0E442",
+         "#D55E00", "#E69F00","#ba0d42","yellow4","#D55E00", "#CC79A7","darkred",
+         "#56B4E9","#86486F","#446455", "bisque4","#F7B1AB","#807182","#E3DDDD",
+         "#A45C3D","coral3","#000099","#E2C59F","#B6C5CC", "#8E9CA3","#556670",
+         "#771C19", "#AA3929","#E25033","#F27314", "#F8A31B","#2D2D2D","#91D1C2B2",
+         "#DC0000B2","#7E6148B2","#E64B35B2", "#4DBBD5B2","#00A087B2","#3C5488B2",
+         "#F39B7FB2","#8491B4B2","#FF2700","#62BBA5","#B58900","#80CDC1","#8073AC",
+     "#0072B2","#392682","#FA41CA","#0B775E","#02401B","#F4B5BD","#B6854D","deepskyblue");mycola
+
+mycol = c("bisque4", "deeppink", "chartreuse4","blue","coral3","goldenrod","deepskyblue","darkred","#0dba2f", "Orange","Yellow", "#850dba","Blue", "Sky Blue", "#ba0d42");mycol
+```
+
+#Consider Bacterial data
+
+
+
+#Load data (ASV table, taxonomy & tree, & metadata)
+```{r,echo = F}
+##Imported feature table
+asv_tab <- read.table("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Table.txt", 
+              header=TRUE,
+              row.names="OTUID");asv_tab
+asv_tab <- otu_table(asv_tab, taxa_are_rows = TRUE);asv_tab 
+
+## Imported taxonomy table
+tax_tab <- read.table("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Taxonomy.txt", 
+              header=TRUE,
+              sep="\t",
+              row.names="OTUID");tax_tab
+tax_tab <- as.matrix(tax_tab);tax_tab
+tax_tab <- tax_table(tax_tab);tax_tab
+
+## Imported metadata file
+metadata <- read.csv("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/Metadata.csv",
+              header=TRUE,
+              row.names="SampleID");metadata
+#rownames(metadata) <- metadata[,1]
+metadata <- sample_data(metadata);metadata
+
+#import rooted tree
+rtree <- read.tree(file = "/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/tree.nwk");rtree
+tree <- phy_tree(rtree)
+
+#import reference sequences
+## Import reference sequences
+# rs_table <- Biostrings::readDNAStringSet(
+#   "outputs/qiime2/dna-sequences.fasta",
+#   format = "fasta",
+#   nrec = -1L,
+#   skip = 0L,
+#   seek.first.rec = F,
+#   use.names = T,
+#   with.qualities = F)
+
+#proof that the data are of equal dimensions
+all(rownames(metadata) %in% colnames(asv_tab))
+
+#Convert to phyloseq object
+ps <- merge_phyloseq(
+  asv_tab,
+  tax_tab, 
+  metadata,
+  tree);ps#[ 16460 taxa & 1197 samples ]
+summarize_phyloseq(ps)
+ps0 <- ps # 16460 taxa & 1197 samples
+save(ps0,
+file = "/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome/ps0.RData")
+
+```
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
