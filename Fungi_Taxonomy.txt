@@ -1,4 +1,4 @@
-OTUID	Kingdom	Phyllum	Class	Order	Family	Genus	Specie
+OTUID	Kingdom	Phylum	Class	Order	Family	Genus	Specie
 d29c7fee81e7a610c0e1a2f004e3e8d9	Fungi	Ascomycota	Eurotiomycetes	Eurotiales	Aspergillaceae	Aspergillus	Unidentified_Aspergillus
 71edb77469cd038fef00ecaaca51e735	Fungi	Ascomycota	Eurotiomycetes	Eurotiales	Aspergillaceae	Aspergillus	Unidentified_Aspergillus
 3baaa1a55f67a004e5bdf88baecff544	Fungi	Ascomycota	Sordariomycetes	Hypocreales	Nectriaceae	Fusarium	Unidentified_Fusarium
