@@ -1,4 +1,4 @@
-#TAXONOMY	Kingdom	Phylum	Class	Order	Family	Genus	species
+OTUID	Kingdom	Phylum	Class	Order	Family	Genus	species
 5bf74637c041dbcdf2a2dc8ca79ce289	Unassigned	Unassigned	Unassigned	Unassigned	Unassigned	Unassigned	Unassigned
 8063576b0c08ea9f40a39f3dcc81f2bc	Bacteria	Cyanobacteria	Oxyphotobacteria	Chloroplast	Nicotiana_attenuata	Nicotiana_attenuata	Nicotiana_attenuata
 fb4c5d6e57976627c2452bb36929bcc1	Bacteria	Cyanobacteria	Oxyphotobacteria	Chloroplast	Citrus_maxima	Citrus_maxima	Citrus_maxima

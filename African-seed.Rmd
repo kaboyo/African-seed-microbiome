@@ -157,7 +157,7 @@ mycola=c("grey35","chartreuse4","#FE7F9D","darkturquoise", "#F0E442","#009E73","
 mycol = c("bisque4", "deeppink", "chartreuse4","blue","coral3","goldenrod","deepskyblue","darkred","#0dba2f", "Orange","Yellow", "#850dba","Blue", "Sky Blue", "#ba0d42");mycol
 ```
 
-#Consider Bacterial data
+#Bacterial community
 
 
 
@@ -342,8 +342,8 @@ Rareaction_Bacteria <- Rareaction_Bacteria + scale_color_manual(values = mycola)
   labs(tag = "")
 print(Rareaction_Bacteria)
 
-tiff("p.tiff", units="in", width=12, height=5, res=300)
-ggsave("p.TIFF", plot = Rareaction_Bacteria)
+tiff("p_bact.tiff", units="in", width=12, height=5, res=300)
+ggsave("p_bact.tiff", plot = Rareaction_Bacteria)
 
 ```
 
@@ -376,9 +376,9 @@ theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
   theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
 
 library(ggpubr)
-tiff("Composition_Genotype.tiff", units="in", width=11, height=5, res=300)
-Composition_Genotype.tiff=gg1+plot_layout(nrow = 1);Composition_Genotype.tiff
-ggsave("Composition_Genotype.tiff", plot = Composition_Genotype.tiff)
+tiff("Composition_Genotype_bact.tiff.tiff", units="in", width=11, height=5, res=300)
+Composition_Genotype_bact.tiff.tiff=gg1+plot_layout(nrow = 1);Composition_Genotype_bact.tiff.tiff
+ggsave("Composition_Genotype_bact.tiff.tiff", plot = Composition_Genotype_bact.tiff.tiff)
 dev.off()
 
 
@@ -398,9 +398,9 @@ theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
   theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
 
 library(ggpubr)
-tiff("Order_Composition_Genotype.tiff", units="in", width=14, height=5, res=300)
-Order_Composition_Genotype.tiff=gg1+plot_layout(nrow = 1);Order_Composition_Genotype.tiff
-ggsave("Order_Composition_Genotype.tiff", plot = Order_Composition_Genotype.tiff)
+tiff("Order_Composition_Genotype_bact.tiff.tiff", units="in", width=14, height=5, res=300)
+Order_Composition_Genotype_bact.tiff.tiff=gg1+plot_layout(nrow = 1);Order_Composition_Genotype_bact.tiff.tiff
+ggsave("Order_Composition_Genotype_bact.tiff.tiff", plot = Order_Composition_Genotype_bact.tiff.tiff)
 dev.off()
 
 ```
@@ -476,7 +476,7 @@ pcares <- get_pca(obj=ps3_Bacteria, method="hellinger");pcares# for PCA ordinati
 pcoares <- get_pcoa(obj=ps3_Bacteria, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
 
 ##Plot PCoA considering the cultivars
-pcaplot1.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+pcaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
                        factorNames=c("Genotype"), ellips3_Bacteriae=F)+
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
@@ -487,11 +487,11 @@ pcaplot1.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1.tiff
-#ggsave("pcaplot1.TIFF", plot = pcaplot1)
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_bacteria.tiff.tiff
+#ggsave("pcaplot1_bacteria.tiff.TIFF", plot = pcaplot1_bacteria.tiff)
 # pc = c(1, 3) to show the first & third principal components.
 
-pcoaplot1.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+pcoaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
                         factorNames=c("Genotype"), ellips3_Bacteriae=F) +
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
@@ -502,12 +502,12 @@ pcoaplot1.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1.tiff
-#ggsave("pcoaplot1.tiff.TIFF", plot = pcoaplot1.tiff);pcoaplot1.tiff
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_bacteria.tiff.tiff
+#ggsave("pcoaplot1_bacteria.tiff.tiff.TIFF", plot = pcoaplot1_bacteria.tiff.tiff);pcoaplot1_bacteria.tiff.tiff
 
 #Combine the figures
 tiff("PCOA_Bacteria_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Bacteria_cultitvars.tiff=pcaplot1.tiff+pcoaplot1.tiff+plot_layout(ncol = 2);PCOA_Bacteria_cultitvars.tiff
+PCOA_Bacteria_cultitvars.tiff=pcaplot1_bacteria.tiff.tiff+pcoaplot1_bacteria.tiff.tiff+plot_layout(ncol = 2);PCOA_Bacteria_cultitvars.tiff
 ggsave("PCOA_Bacteria_cultitvars.tiff", plot = PCOA_Bacteria_cultitvars.tiff)
 dev.off()
 ###################################################################################################
@@ -637,9 +637,972 @@ CLD_Bacterial_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Bacterial
 
 
 
+#Fungal community
 
 
 
+#Load data (ASV table, taxonomy & tree, & metadata_Fungi)
+```{r,echo = F}
+##Imported feature table
+asv_tab_Fungi <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Fungi_Table.txt", 
+              header=TRUE,
+              row.names="OTUID");asv_tab_Fungi
+asv_tab_Fungi <- otu_table(asv_tab_Fungi, taxa_are_rows = TRUE);asv_tab_Fungi 
+
+## Imported taxonomy table
+tax_tab_Fungi <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Fungi_Taxonomy.txt", 
+              header=TRUE,
+              sep="\t",
+              row.names="OTUID");tax_tab_Fungi
+tax_tab_Fungi <- as.matrix(tax_tab_Fungi);tax_tab_Fungi
+tax_tab_Fungi <- tax_table(tax_tab_Fungi);tax_tab_Fungi
+
+## Imported metadata_Fungi file
+metadata_Fungi <- read.csv("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Fungi_Metadata.csv",
+              header=TRUE,
+              row.names="SampleID");metadata_Fungi
+#rownames(metadata_Fungi) <- metadata_Fungi[,1]
+metadata_Fungi <- sample_data(metadata_Fungi);metadata_Fungi
+
+#import reference sequences
+## Import reference sequences
+# rs_table <- Biostrings::readDNAStringSet(
+#   "outputs/qiime2/dna-sequences.fasta",
+#   format = "fasta",
+#   nrec = -1L,
+#   skip = 0L,
+#   seek.first.rec = F,
+#   use.names = T,
+#   with.qualities = F)
+
+#proof that the data are of equal dimensions
+all(rownames(metadata_Fungi) %in% colnames(asv_tab_Fungi))
+
+#Convert to phyloseq object
+ps_Fungi <- merge_phyloseq(
+  asv_tab_Fungi,
+  tax_tab_Fungi, 
+  metadata_Fungi);ps_Fungi#[ 16460 taxa & 1197 samples ]
+summarize_phyloseq(ps_Fungi)
+ps0_Fungi <- ps_Fungi # 16460 taxa & 1197 samples
+save(ps0_Fungi,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Fungi.RData")
+
+```
+
+
+#clean the data
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Fungi.RData")
+
+ps_clean_Fungi = subset_taxa(ps0_Fungi, Kingdom=="Fungi");ps_clean_Fungi# [ 6448 taxa & 84 samples ]
+#ps_clean_Fungi = subset_taxa(ps_clean_Fungi, Phylum!="CyanoFungi");ps_clean_Fungi#  [ 15588 taxa & 1197 samples ]
+#ps_clean_Fungi = subset_taxa(ps_clean_Fungi, Order!="Chloroplast");ps_clean_Fungi#  [ 15588 taxa & 1197 samples ]
+#ps_clean_Fungi = subset_taxa(ps_clean_Fungi, Family!="Mitochondria");ps_clean_Fungi# [ 15588 taxa & 1197 samples ]
+ps_clean_Fungi <- prune_taxa(taxa_sums(ps_clean_Fungi)>0, ps_clean_Fungi);ps_clean_Fungi# [ 15588 taxa & 1197 samples ]
+
+ps1_Fungi <- ps_clean_Fungi
+
+sort(sample_sums(ps1_Fungi))
+summary(sample_sums(ps1_Fungi)) # mean reads/sample = 22791
+summarize_phyloseq(ps1_Fungi) # Average reads = 22791, Total reads = 27281011, Singletons = 38
+taxa_names(ps1_Fungi)[1:5]
+sample_data(ps1_Fungi)$total_reads <- sample_sums(ps1_Fungi)
+
+save(ps1_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Fungi.RData")
+
+K <- as.data.frame(table(tax_table(ps1_Fungi)[,"Kingdom"]));K
+P <- as.data.frame(table(tax_table(ps1_Fungi)[,"Phylum"]));P # 38 phyla
+C <- as.data.frame(table(tax_table(ps1_Fungi)[,"Class"]));C # 109 classes
+O <- as.data.frame(table(tax_table(ps1_Fungi)[,"Order"]));O # 261 orders
+Fa <- as.data.frame(table(tax_table(ps1_Fungi)[,"Family"]));Fa # 476 families
+G <- as.data.frame(table(tax_table(ps1_Fungi)[,"Genus"]));G # 1187 genera
+#S <- as.data.frame(table(tax_table(ps1_Fungi)[,"Species"]));S # 1264 species
+
+microbiome::summarize_phyloseq(ps1_Fungi)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+# Total number of reads = 27281011"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+taxonomy <- as.vector(phyloseq::tax_table(ps1_Fungi))
+sums_ps1_Fungi <- sample_sums(ps1_Fungi);sums_ps1_Fungi
+sums_ps1_Fungi <- data.frame(sums_ps1_Fungi);sums_ps1_Fungi
+sums_ps1_Fungi <- as.matrix(sums_ps1_Fungi);sums_ps1_Fungi
+colSums(sums_ps1_Fungi) #  27281011      
+max(sums_ps1_Fungi) #225892
+min(sums_ps1_Fungi) # 68
+sums_ps1_Fungi
+```
+
+
+#Filter data at 0.025 prevalence
+
+#Obtained from: https://f1000research.com/articles/5-1492/v1;#One of the reasons to filter by prevalence is to avoid spending #much time analyzing taxa that were only rarely seen. This also turns out to be a useful filter of noise (taxa that are #actually just artifacts of the data collection process)
+# Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
+
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Fungi.RData")
+
+prev0 = apply(X = otu_table(ps1_Fungi),
+              MARGIN = ifelse(taxa_are_rows(ps1_Fungi), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)})
+
+prevdf = data.frame(Prevalence = prev0,
+                    TotalAbundance = taxa_sums(ps1_Fungi),
+                    tax_table(ps1_Fungi))# the most prevalent ASVs present therein the composition
+
+#only for reference, in case we want to filter Phyla that appear less than X times
+keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 0)]
+
+prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
+
+# Define prevalence threshold as 0.25% of total samples# 
+prevalenceThreshold = 0.0025 * nsamples(ps1_Fungi)
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps2_Fungi_Fungi = prune_taxa((prev0 > prevalenceThreshold), ps1_Fungi);ps2_Fungi_Fungi
+
+# Filter entries with unidentified Phylum.
+ps3_Fungi = subset_taxa(ps2_Fungi_Fungi, Phylum %in% names(keepPhyla));ps3_Fungi
+
+#Plot prevalence of different phyla
+#https://github.com/joey711/phyloseq/issues/1474
+
+ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 2, alpha = 0.65) +
+  scale_y_log10() + scale_x_log10() +
+  ggtitle(paste0("Prevalence filtering, using a threshold of ", prevalenceThreshold))+
+  xlab("Total Abundance") +
+  scale_color_manual(values=ocean.balance(38))+
+  theme_bw()+
+  facet_wrap(~Phylum, nrow = 4)
+
+print(paste0("Initial #ASVs:", ntaxa(ps1_Fungi), ". #ASVs after prevalence filtering:", ntaxa(ps3_Fungi), ". #ASVs removed: ", ntaxa(ps1_Fungi)-ntaxa(ps3_Fungi)))
+```
+
+# Save the Fungil object
+```{r}
+save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+```
+
+
+
+
+##plot rarefaction curves  for the Fungil community
+#code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
+```{r, echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+library(microbiomeutilities)
+# set seed
+set.seed(1)
+subsamples <- seq(0, 50000, by=500)[-1]
+#subsamples = c(10, 5000, 10000, 20000, 30000)
+
+Rareaction_Fungi <- plot_alpha_rcurve(ps3_Fungi, index="observed",
+            subsamples = subsamples,
+            lower.conf = 0.025, 
+            upper.conf = 0.975,
+            group="Genotype",
+            label.color = "brown3",
+            label.size = 3,
+            label.min = TRUE);Rareaction_Fungi
+
+Rareaction_Fungi <- Rareaction_Fungi + scale_color_manual(values = mycola) + 
+  scale_fill_manual(values = mycola)+ 
+  theme(axis.text=element_text(size=8), panel.grid=element_blank(),
+        strip.background = element_rect(colour=NA,fill="grey33"),
+        strip.text.x = element_text(face="bold"))+
+  theme(text=element_text(size=14,  family="sans"))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
+  theme(legend.position="none")+
+  labs(tag = "")
+print(Rareaction_Fungi)
+
+tiff("p_Fungi.tiff", units="in", width=12, height=5, res=300)
+ggsave("p_Fungi.tiff", plot = Rareaction_Fungi)
+
+```
+
+#Transformed to relative abundances 
+#bar blot of the seed microbiome composition in the different cukltivars at the various locations for the top500 ASVs
+
+```{r,echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+
+# Bar plots:
+##Showing individual replicates. Top 500 taxa
+toptax = names(sort(taxa_sums(ps3_Fungi), decreasing=TRUE))[1:500];toptax
+ps.toptax_Fungi = transform_sample_counts(ps3_Fungi, function(x) {x/sum(x)*100});ps.toptax_Fungi
+ps.toptax_Fungi <- prune_taxa(toptax, ps.toptax_Fungi);ps.toptax_Fungi
+
+#Class level
+psmelt(ps.toptax_Fungi)
+gg2=ggplot(psmelt(ps.toptax_Fungi), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Class))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  #scale_fill_manual(values=c("grey35","darkturquoise","#009E73",
+   #      "Orange","#6A3D9A","#00AFBB","steelblue", "#cccda7", "#bfb77b", "7e9998", "#92B2B2", "#83bbbf", "#58a0c4","#8973b4", #"#56B4E9","#86486F","#446455", "bisque4"))+
+  scale_fill_manual(values = mycolors)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Class, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg2
+
+library(ggpubr)
+tiff("Composition_Genotype_fungi.tiff", units="in", width=11, height=5, res=300)
+Composition_Genotype_fungi.tiff=gg2+plot_layout(nrow = 1);Composition_Genotype_fungi.tiff
+ggsave("Composition_Genotype_fungi.tiff", plot = Composition_Genotype_fungi.tiff)
+dev.off()
+
+
+#Order level
+psmelt(ps.toptax_Fungi)
+gg2=ggplot(psmelt(ps.toptax_Fungi), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Order))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  #scale_fill_manual(values=c("#25725d", "#439b5b", "#7bc369", "#abd69a", "#d8e8b0", "#cccda7", "#bfb77b", "#7e9998", "#92B2B2", "#83bbbf", "#61acc1", "#58a0c4", "#7087c3","#8973b4", "#512972"))+
+  scale_fill_manual(values = mycola)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Order, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg2
+
+library(ggpubr)
+tiff("Order_Composition_Genotype_fungi.tiff", units="in", width=14, height=5, res=300)
+Order_Composition_Genotype_fungi.tiff=gg2+plot_layout(nrow = 1);Order_Composition_Genotype_fungi.tiff
+ggsave("Order_Composition_Genotype_fungi.tiff", plot = Order_Composition_Genotype_fungi.tiff)
+dev.off()
+
+```
+
+#Average percentage composition class
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+#Convert to relative abundance or the computation of the micribial composition in the samples
+#consider phylum
+GPf_Phylum = tax_glom(ps3_Fungi, "Phylum") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Phylum = data.frame(Phylum = tax_table(GPf_Phylum)[,"Phylum"], Mean = rowMeans(otu_table(GPf_Phylum)), row.names = NULL)
+df_Phylum = df_Phylum[order(-df_Phylum$Mean),];df_Phylum
+head(df_Phylum,20)
+
+#consider Class
+GPf_Class = tax_glom(ps3_Fungi, "Class") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Class = data.frame(Class = tax_table(GPf_Class)[,"Class"], Mean = rowMeans(otu_table(GPf_Class)), row.names = NULL)
+df_Class = df_Class[order(-df_Class$Mean),];df_Class
+head(df_Class,20)
+
+#consider Order
+GPf_Order = tax_glom(ps3_Fungi, "Order") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Order = data.frame(Order = tax_table(GPf_Order)[,"Order"], Mean = rowMeans(otu_table(GPf_Order)), row.names = NULL)
+df_Order = df_Order[order(-df_Order$Mean),];df_Order
+head(df_Order,20)
+
+#consider Family
+GPf_Family = tax_glom(ps3_Fungi, "Family") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Family = data.frame(Family = tax_table(GPf_Family)[,"Family"], Mean = rowMeans(otu_table(GPf_Family)), row.names = NULL)
+df_Family = df_Family[order(-df_Family$Mean),];df_Family
+head(df_Family,20)
+
+#consider Genus
+GPf_Genus = tax_glom(ps3_Fungi, "Genus") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Genus = data.frame(Genus = tax_table(GPf_Genus)[,"Genus"], Mean = rowMeans(otu_table(GPf_Genus)), row.names = NULL)
+df_Genus = df_Genus[order(-df_Genus$Mean),];df_Genus
+head(df_Genus,20)
+
+```
+
+
+
+#Computing the beta-diversity plots & stats
+#USING THE MicrobiotaProcess package
+
+#https3_Fungi://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.htm
+#https3_Fungi://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html
+#library(MicrobiotaProcess)
+#Will consider the transformation by hellinger approach
+
+##Consider the cultivars
+```{r,echo=FALSE, warning=FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+library(MicrobiotaProcess)
+
+distme <- get_dist(ps3_Fungi, distmethod ="bray", method="hellinger");distme
+sampleda <- data.frame(sample_data(ps3_Fungi), check.names=FALSE);sampleda
+sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
+sampleda$Genotype <- factor(sampleda$Genotype)
+adores <- adonis2(distme ~ Genotype, 
+                  data=sampleda, 
+                  permutation=999);adores
+
+#           Df SumOfSqs       R2      F Pr(>F)    
+#Model     4   6.6151 0.85924 38.152  0.001 ***
+#Residual 25   1.0837 0.14076                  
+#Total    29   7.6988 1.00000                  
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+###################################################################################################
+# "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
+pcares <- get_pca(obj=ps3_Fungi, method="hellinger");pcares# for PCA ordination to show sample distribution
+pcoares <- get_pcoa(obj=ps3_Fungi, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
+
+##Plot PCoA considering the cultivars
+pcaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+                       factorNames=c("Genotype"), ellips3_Fungie=F)+
+  scale_fill_manual(values=mycola)+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size=1))+
+  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
+        axis.text.y = element_text(size=12, face="bold", color = "black"))+
+  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
+  theme(legend.title=element_blank())+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_fungi.tiff.tiff
+#ggsave("pcaplot1_fungi.tiff.tiff", plot = pcaplot1)
+# pc = c(1, 3) to show the first & third principal components.
+
+pcoaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+                        factorNames=c("Genotype"), ellips3_Fungie=F) +
+  scale_fill_manual(values=mycola)+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size=1))+
+  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
+        axis.text.y = element_text(size=12, face="bold", color = "black"))+
+  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
+  theme(legend.title=element_blank())+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_fungi.tiff.tiff
+#ggsave("pcoaplot1_fungi.tiff.tiff.TIFF", plot = pcoaplot1_fungi.tiff.tiff);pcoaplot1_fungi.tiff.tiff
+
+#Combine the figures
+tiff("PCOA_Fungi_cultitvars.tiff", units="in", width=6, height=3, res=300)
+PCOA_Fungi_cultitvars.tiff=pcaplot1_fungi.tiff.tiff+pcoaplot1_fungi.tiff.tiff+plot_layout(ncol = 2);PCOA_Fungi_cultitvars.tiff
+ggsave("PCOA_Fungi_cultitvars.tiff", plot = PCOA_Fungi_cultitvars.tiff)
+dev.off()
+###################################################################################################
+```
+
+
+#alpha diversity
+```{r}
+ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+
+Fungi_subsamp <- rarefy_even_depth(ps3_Fungi, sample.size=5500  , rngseed=5163, replace=FALSE, trimOTUs=TRUE);Fungi_subsamp#[ 1128 samples by 20 sample variables ]
+Fungi_richness = estimate_richness(Fungi_subsamp , measures=c("Observed","Shannon"))
+Fungi_richness_table <- as.data.frame(as.matrix(Fungi_richness))
+write.csv(Fungi_richness_table,file = "Fungi_richness_table.csv")
+Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
+```
+
+
+#Fungil diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
+attach(Fungi_richness)
+plot_Fungi_rich=ggboxplot(Fungi_richness, x = "Genotype", y = "Observed",fill  = "Genotype", ylab = "Observed ASVs", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungi_rich
+
+
+tiff("Fungi_rich.tiff", units="in", width=2, height=3, res=300)
+Fungi_rich.tiff=plot_Fungi_rich+plot_layout(ncol =1 );Fungi_rich.tiff
+ggsave("Fungi_rich.tiff", plot = Fungi_rich.tiff)
+dev.off()
+
+
+
+plot_Fungi_Shannon=ggboxplot(Fungi_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon ASVs", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungi_Shannon
+
+
+tiff("Fungi_Shannon.tiff", units="in", width=2, height=3, res=300)
+Fungi_Shannon.tiff=plot_Fungi_Shannon+plot_layout(ncol =1 );Fungi_Shannon.tiff
+ggsave("Fungi_Shannon.tiff", plot = Fungi_Shannon.tiff)
+dev.off()
+```
+
+
+
+#Fungil diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
+attach(Fungil_richness)
+
+#Consider microbial richness
+#Normality
+shapiro.test(Observed)
+#W = 0.92561, p-value = 0.04239
+
+#statistics measures for the different Fungil indices
+kruskal.test(Observed ~ Genotype, data = Fungil_richness)
+
+#data:  Observed by Genotype
+#Kruskal-Wallis chi-squared = 23.146, df = 4, p-value = 0.0001184
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Fungil_Dunn_observed_genotype=dunn_test(Fungil_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_observed_genotype
+write_csv(Fungil_Dunn_observed_genotype, "Fungil_Dunn_observed_genotype.csv")
+Fungil_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Fungil_Dunn_observed_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Fungil_Dunn_observed_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_observed_genotype$res);CLD_Fungil_Dunn_observed_genotype 
+```
+
+
+#Fungil diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
+attach(Fungil_richness)
+
+#Consider microbial Shannon
+#Normality
+shapiro.test(Shannon)
+#W = 0.91522, p-value = 0.02311
+
+#statistics measures for the different Fungil indices
+kruskal.test(Shannon ~ Genotype, data = Fungil_richness)
+
+#data:  Shannon by Genotype
+#Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Fungil_Dunn_Shannon_genotype=dunn_test(Fungil_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_Shannon_genotype
+write_csv(Fungil_Dunn_Shannon_genotype, "Fungil_Dunn_Shannon_genotype.csv")
+Fungil_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungil_Dunn_Shannon_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Fungil_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_Shannon_genotype$res);CLD_Fungil_Dunn_Shannon_genotype 
+
+```
+
+
+
+#Archaeal community
+
+
+#Load data (ASV table, taxonomy & tree, & metadata_Archaea)
+```{r,echo = F}
+##Imported feature table
+asv_tab_Archaea <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Archaea_Table.txt", 
+              header=TRUE,
+              row.names="OTUID",sep="\t");asv_tab_Archaea
+asv_tab_Archaea <- otu_table(asv_tab_Archaea, taxa_are_rows = TRUE);asv_tab_Archaea 
+
+## Imported taxonomy table
+tax_tab_Archaea <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Archaea_Taxonomy.txt", 
+              header=TRUE,
+              sep="\t",
+              row.names="OTUID");tax_tab_Archaea
+tax_tab_Archaea <- as.matrix(tax_tab_Archaea);tax_tab_Archaea
+tax_tab_Archaea <- tax_table(tax_tab_Archaea);tax_tab_Archaea
+
+## Imported metadata_Archaea file
+metadata_Archaea <- read.csv("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Archaea_Metadata.csv",
+              header=TRUE,
+              row.names="SampleID");metadata_Archaea
+#rownames(metadata_Archaea) <- metadata_Archaea[,1]
+metadata_Archaea <- sample_data(metadata_Archaea);metadata_Archaea
+
+#import reference sequences
+## Import reference sequences
+# rs_table <- Biostrings::readDNAStringSet(
+#   "outputs/qiime2/dna-sequences.fasta",
+#   format = "fasta",
+#   nrec = -1L,
+#   skip = 0L,
+#   seek.first.rec = F,
+#   use.names = T,
+#   with.qualities = F)
+
+#proof that the data are of equal dimensions
+all(rownames(metadata_Archaea) %in% colnames(asv_tab_Archaea))
+
+#Convert to phyloseq object
+ps_Archaea <- merge_phyloseq(
+  asv_tab_Archaea,
+  tax_tab_Archaea, 
+  metadata_Archaea);ps_Archaea#[ 16460 taxa & 1197 samples ]
+summarize_phyloseq(ps_Archaea)
+ps0_Archaea <- ps_Archaea # 16460 taxa & 1197 samples
+save(ps0_Archaea,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Archaea.RData")
+
+```
+
+
+#clean the data
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Archaea.RData")
+
+ps_clean_Archaea = subset_taxa(ps0_Archaea, Kingdom=="Archaea");ps_clean_Archaea# [ 6448 taxa & 84 samples ]
+#ps_clean_Archaea = subset_taxa(ps_clean_Archaea, Phylum!="CyanoArchaea");ps_clean_Archaea#  [ 15588 taxa & 1197 samples ]
+#ps_clean_Archaea = subset_taxa(ps_clean_Archaea, Order!="Chloroplast");ps_clean_Archaea#  [ 15588 taxa & 1197 samples ]
+#ps_clean_Archaea = subset_taxa(ps_clean_Archaea, Family!="Mitochondria");ps_clean_Archaea# [ 15588 taxa & 1197 samples ]
+ps_clean_Archaea <- prune_taxa(taxa_sums(ps_clean_Archaea)>0, ps_clean_Archaea);ps_clean_Archaea# [ 15588 taxa & 1197 samples ]
+
+ps1_Archaea <- ps_clean_Archaea
+
+sort(sample_sums(ps1_Archaea))
+summary(sample_sums(ps1_Archaea)) # mean reads/sample = 22791
+summarize_phyloseq(ps1_Archaea) # Average reads = 22791, Total reads = 27281011, Singletons = 38
+taxa_names(ps1_Archaea)[1:5]
+sample_data(ps1_Archaea)$total_reads <- sample_sums(ps1_Archaea)
+
+save(ps1_Archaea, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Archaea.RData")
+
+K <- as.data.frame(table(tax_table(ps1_Archaea)[,"Kingdom"]));K
+P <- as.data.frame(table(tax_table(ps1_Archaea)[,"Phylum"]));P # 38 phyla
+C <- as.data.frame(table(tax_table(ps1_Archaea)[,"Class"]));C # 109 classes
+O <- as.data.frame(table(tax_table(ps1_Archaea)[,"Order"]));O # 261 orders
+Fa <- as.data.frame(table(tax_table(ps1_Archaea)[,"Family"]));Fa # 476 families
+G <- as.data.frame(table(tax_table(ps1_Archaea)[,"Genus"]));G # 1187 genera
+#S <- as.data.frame(table(tax_table(ps1_Archaea)[,"Species"]));S # 1264 species
+
+microbiome::summarize_phyloseq(ps1_Archaea)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+# Total number of reads = 27281011"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+taxonomy <- as.vector(phyloseq::tax_table(ps1_Archaea))
+sums_ps1_Archaea <- sample_sums(ps1_Archaea);sums_ps1_Archaea
+sums_ps1_Archaea <- data.frame(sums_ps1_Archaea);sums_ps1_Archaea
+sums_ps1_Archaea <- as.matrix(sums_ps1_Archaea);sums_ps1_Archaea
+colSums(sums_ps1_Archaea) #  27281011      
+max(sums_ps1_Archaea) #225892
+min(sums_ps1_Archaea) # 68
+sums_ps1_Archaea
+```
+
+
+#Filter data at 0.025 prevalence
+
+#Obtained from: https://f1000research.com/articles/5-1492/v1;#One of the reasons to filter by prevalence is to avoid spending #much time analyzing taxa that were only rarely seen. This also turns out to be a useful filter of noise (taxa that are #actually just artifacts of the data collection process)
+# Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
+
+```{r,echo = FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Archaea.RData")
+
+prev0 = apply(X = otu_table(ps1_Archaea),
+              MARGIN = ifelse(taxa_are_rows(ps1_Archaea), yes = 1, no = 2),
+              FUN = function(x){sum(x > 0)})
+
+prevdf = data.frame(Prevalence = prev0,
+                    TotalAbundance = taxa_sums(ps1_Archaea),
+                    tax_table(ps1_Archaea))# the most prevalent ASVs present therein the composition
+
+#only for reference, in case we want to filter Phyla that appear less than X times
+keepPhyla = table(prevdf$Phylum)[(table(prevdf$Phylum) > 0)]
+
+prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
+
+# Define prevalence threshold as 0.25% of total samples# 
+prevalenceThreshold = 0.00025 * nsamples(ps1_Archaea)
+prevalenceThreshold
+
+# Execute prevalence filter, using `prune_taxa()` function
+ps2_Archaea_Archaea = prune_taxa((prev0 > prevalenceThreshold), ps1_Archaea);ps2_Archaea_Archaea
+
+# Filter entries with unidentified Phylum.
+ps3_Archaea = subset_taxa(ps2_Archaea_Archaea, Phylum %in% names(keepPhyla));ps3_Archaea
+
+#Plot prevalence of different phyla
+#https://github.com/joey711/phyloseq/issues/1474
+
+ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
+  geom_hline(yintercept = prevalenceThreshold, alpha = 0.5, linetype = 2) +
+  geom_point(size = 2, alpha = 0.65) +
+  scale_y_log10() + scale_x_log10() +
+  ggtitle(paste0("Prevalence filtering, using a threshold of ", prevalenceThreshold))+
+  xlab("Total Abundance") +
+  scale_color_manual(values=ocean.balance(38))+
+  theme_bw()+
+  facet_wrap(~Phylum, nrow = 4)
+
+print(paste0("Initial #ASVs:", ntaxa(ps1_Archaea), ". #ASVs after prevalence filtering:", ntaxa(ps3_Archaea), ". #ASVs removed: ", ntaxa(ps1_Archaea)-ntaxa(ps3_Archaea)))
+```
+
+# Save the Archaeal object
+```{r}
+save(ps3_Archaea, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+```
+
+
+
+
+##plot rarefaction curves  for the Archaeal community
+#code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
+```{r, echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+library(microbiomeutilities)
+# set seed
+set.seed(1)
+subsamples <- seq(0, 50000, by=500)[-1]
+#subsamples = c(10, 5000, 10000, 20000, 30000)
+
+Rareaction_Archaea <- plot_alpha_rcurve(ps3_Archaea, index="observed",
+            subsamples = subsamples,
+            lower.conf = 0.025, 
+            upper.conf = 0.975,
+            group="Genotype",
+            label.color = "brown3",
+            label.size = 3,
+            label.min = TRUE);Rareaction_Archaea
+
+Rareaction_Archaea <- Rareaction_Archaea + scale_color_manual(values = mycola) + 
+  scale_fill_manual(values = mycola)+ 
+  theme(axis.text=element_text(size=8), panel.grid=element_blank(),
+        strip.background = element_rect(colour=NA,fill="grey33"),
+        strip.text.x = element_text(face="bold"))+
+  theme(text=element_text(size=14,  family="sans"))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
+  theme(legend.position="none")+
+  labs(tag = "")
+print(Rareaction_Archaea)
+
+tiff("p_Archaea.tiff", units="in", width=12, height=5, res=300)
+ggsave("p_Archaea.tiff", plot = Rareaction_Archaea)
+
+```
+
+#Transformed to relative abundances 
+#bar blot of the seed microbiome composition in the different cukltivars at the various locations for the top500 ASVs
+
+```{r,echo=FALSE,warning = FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+
+# Bar plots:
+##Showing individual replicates. Top 500 taxa
+toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
+ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
+
+#Class level
+psmelt(ps.toptax_Archaea)
+gg3=ggplot(psmelt(ps.toptax_Archaea), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Class))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  #scale_fill_manual(values=c("grey35","darkturquoise","#009E73",
+   #      "Orange","#6A3D9A","#00AFBB","steelblue", "#cccda7", "#bfb77b", "7e9998", "#92B2B2", "#83bbbf", "#58a0c4","#8973b4", #"#56B4E9","#86486F","#446455", "bisque4"))+
+  scale_fill_manual(values = mycolors)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Class, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg3
+
+library(ggpubr)
+tiff("Composition_Genotype_Archaea.tiff", units="in", width=11, height=5, res=300)
+Composition_Genotype_Archaea.tiff=gg3+plot_layout(nrow = 1);Composition_Genotype_Archaea.tiff
+ggsave("Composition_Genotype_Archaea.tiff", plot = Composition_Genotype_Archaea.tiff)
+dev.off()
+
+
+#Order level
+psmelt(ps.toptax_Archaea)
+gg3=ggplot(psmelt(ps.toptax_Archaea), aes(x=reorder(Sample, Genotype), y=Abundance, fill=Order))+
+  geom_bar(stat = "identity", position = "stack", width = 1) +
+  #scale_fill_manual(values=c(ocean.dense(7), ocean.tempo(8)))+
+  #scale_fill_manual(values=c("#25725d", "#439b5b", "#7bc369", "#abd69a", "#d8e8b0", "#cccda7", "#bfb77b", "#7e9998", "#92B2B2", "#83bbbf", "#61acc1", "#58a0c4", "#7087c3","#8973b4", "#512972"))+
+  scale_fill_manual(values = mycola)+
+  xlab("") + ylab("Relative abundance (%)") +
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
+  ggtitle("Order, top 500 ASVs") +
+  theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
+theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow = 2))+
+  theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg3
+
+library(ggpubr)
+tiff("Order_Composition_Genotype_Archaea.tiff", units="in", width=14, height=5, res=300)
+Order_Composition_Genotype_Archaea.tiff=gg3+plot_layout(nrow = 1);Order_Composition_Genotype_Archaea.tiff
+ggsave("Order_Composition_Genotype_Archaea.tiff", plot = Order_Composition_Genotype_Archaea.tiff)
+dev.off()
+
+```
+
+#Average percentage composition class
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+#Convert to relative abundance or the computation of the micribial composition in the samples
+#consider phylum
+GPf_Phylum = tax_glom(ps3_Archaea, "Phylum") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Phylum = data.frame(Phylum = tax_table(GPf_Phylum)[,"Phylum"], Mean = rowMeans(otu_table(GPf_Phylum)), row.names = NULL)
+df_Phylum = df_Phylum[order(-df_Phylum$Mean),];df_Phylum
+head(df_Phylum,20)
+
+#consider Class
+GPf_Class = tax_glom(ps3_Archaea, "Class") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Class = data.frame(Class = tax_table(GPf_Class)[,"Class"], Mean = rowMeans(otu_table(GPf_Class)), row.names = NULL)
+df_Class = df_Class[order(-df_Class$Mean),];df_Class
+head(df_Class,20)
+
+#consider Order
+GPf_Order = tax_glom(ps3_Archaea, "Order") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Order = data.frame(Order = tax_table(GPf_Order)[,"Order"], Mean = rowMeans(otu_table(GPf_Order)), row.names = NULL)
+df_Order = df_Order[order(-df_Order$Mean),];df_Order
+head(df_Order,20)
+
+#consider Family
+GPf_Family = tax_glom(ps3_Archaea, "Family") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Family = data.frame(Family = tax_table(GPf_Family)[,"Family"], Mean = rowMeans(otu_table(GPf_Family)), row.names = NULL)
+df_Family = df_Family[order(-df_Family$Mean),];df_Family
+head(df_Family,20)
+
+#consider Genus
+GPf_Genus = tax_glom(ps3_Archaea, "Genus") %>% transform_sample_counts(function(x) {x * 100/sum(x)})
+df_Genus = data.frame(Genus = tax_table(GPf_Genus)[,"Genus"], Mean = rowMeans(otu_table(GPf_Genus)), row.names = NULL)
+df_Genus = df_Genus[order(-df_Genus$Mean),];df_Genus
+head(df_Genus,20)
+
+```
+
+
+
+#Computing the beta-diversity plots & stats
+#USING THE MicrobiotaProcess package
+
+#https3_Archaea://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.htm
+#https3_Archaea://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html
+#library(MicrobiotaProcess)
+#Will consider the transformation by hellinger approach
+
+##Consider the cultivars
+```{r,echo=FALSE, warning=FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+library(MicrobiotaProcess)
+
+distme <- get_dist(ps3_Archaea, distmethod ="bray", method="hellinger");distme
+sampleda <- data.frame(sample_data(ps3_Archaea), check.names=FALSE);sampleda
+sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
+sampleda$Genotype <- factor(sampleda$Genotype)
+adores <- adonis2(distme ~ Genotype, 
+                  data=sampleda, 
+                  permutation=999);adores
+
+#           Df SumOfSqs       R2      F Pr(>F)    
+#Model     4   6.6151 0.85924 38.152  0.001 ***
+#Residual 25   1.0837 0.14076                  
+#Total    29   7.6988 1.00000                  
+#---
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+###################################################################################################
+###################################################################################################
+```
+
+
+
+#alpha diversity
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+library(MicrobiotaProcess)
+
+# "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
+pcares <- get_pca(obj=ps3_Archaea, method="hellinger");pcares# for PCA ordination to show sample distribution
+pcoares <- get_pcoa(obj=ps3_Archaea, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
+
+##Plot PCoA considering the cultivars
+pcaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+                       factorNames=c("Genotype"), ellips3_Archaeae=F)+
+  scale_fill_manual(values=mycola)+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size=1))+
+  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
+        axis.text.y = element_text(size=12, face="bold", color = "black"))+
+  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
+  theme(legend.title=element_blank())+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_Archaea.tiff.tiff
+#ggsave("pcaplot1_Archaea.tiff.tiff", plot = pcaplot1)
+# pc = c(1, 3) to show the first & third principal components.
+
+pcoaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+                        factorNames=c("Genotype"), ellips3_Archaeae=F) +
+  scale_fill_manual(values=mycola)+
+  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "black", size=1))+
+  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
+        axis.text.y = element_text(size=12, face="bold", color = "black"))+
+  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
+  theme(legend.title=element_blank())+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_Archaea.tiff.tiff
+#ggsave("pcoaplot1_Archaea.tiff.tiff.TIFF", plot = pcoaplot1_Archaea.tiff.tiff);pcoaplot1_Archaea.tiff.tiff
+
+#Combine the figures
+tiff("PCOA_Archaea_cultitvars.tiff", units="in", width=6, height=3, res=300)
+PCOA_Archaea_cultitvars.tiff=pcaplot1_Archaea.tiff.tiff+pcoaplot1_Archaea.tiff.tiff+plot_layout(ncol = 2);PCOA_Archaea_cultitvars.tiff
+ggsave("PCOA_Archaea_cultitvars.tiff", plot = PCOA_Archaea_cultitvars.tiff)
+dev.off()
+```
+
+
+
+#alpha diversity
+```{r}
+ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+
+Archaea_subsamp <- rarefy_even_depth(ps3_Archaea, sample.size=5500  , rngseed=5163, replace=FALSE, trimOTUs=TRUE);Archaea_subsamp#[ 1128 samples by 20 sample variables ]
+Archaea_richness = estimate_richness(Archaea_subsamp , measures=c("Observed","Shannon"))
+Archaea_richness_table <- as.data.frame(as.matrix(Archaea_richness))
+write.csv(Archaea_richness_table,file = "Archaea_richness_table.csv")
+Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
+```
+
+
+#Archaeal diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
+attach(Archaea_richness)
+plot_Archaea_rich=ggboxplot(Archaea_richness, x = "Genotype", y = "Observed",fill  = "Genotype", ylab = "Observed ASVs", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_rich
+
+
+tiff("Archaea_rich.tiff", units="in", width=2, height=3, res=300)
+Archaea_rich.tiff=plot_Archaea_rich+plot_layout(ncol =1 );Archaea_rich.tiff
+ggsave("Archaea_rich.tiff", plot = Archaea_rich.tiff)
+dev.off()
+
+
+
+plot_Archaea_Shannon=ggboxplot(Archaea_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon ASVs", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_Shannon
+
+
+tiff("Archaea_Shannon.tiff", units="in", width=2, height=3, res=300)
+Archaea_Shannon.tiff=plot_Archaea_Shannon+plot_layout(ncol =1 );Archaea_Shannon.tiff
+ggsave("Archaea_Shannon.tiff", plot = Archaea_Shannon.tiff)
+dev.off()
+```
+
+
+
+#Archaeal diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
+attach(Archaeal_richness)
+
+#Consider microbial richness
+#Normality
+shapiro.test(Observed)
+#W = 0.92561, p-value = 0.04239
+
+#statistics measures for the different Archaeal indices
+kruskal.test(Observed ~ Genotype, data = Archaeal_richness)
+
+#data:  Observed by Genotype
+#Kruskal-Wallis chi-squared = 23.146, df = 4, p-value = 0.0001184
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Archaeal_Dunn_observed_genotype=dunn_test(Archaeal_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_observed_genotype
+write_csv(Archaeal_Dunn_observed_genotype, "Archaeal_Dunn_observed_genotype.csv")
+Archaeal_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Archaeal_Dunn_observed_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Archaeal_Dunn_observed_genotype = cldList(P.adj ~ Comparison, data=Archaeal_Dunn_observed_genotype$res);CLD_Archaeal_Dunn_observed_genotype 
+```
+
+
+#Archaeal diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
+attach(Archaeal_richness)
+
+#Consider microbial Shannon
+#Normality
+shapiro.test(Shannon)
+#W = 0.91522, p-value = 0.02311
+
+#statistics measures for the different Archaeal indices
+kruskal.test(Shannon ~ Genotype, data = Archaeal_richness)
+
+#data:  Shannon by Genotype
+#Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Archaeal_Dunn_Shannon_genotype=dunn_test(Archaeal_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_Shannon_genotype
+write_csv(Archaeal_Dunn_Shannon_genotype, "Archaeal_Dunn_Shannon_genotype.csv")
+Archaeal_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Archaeal_Dunn_Shannon_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Archaeal_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Archaeal_Dunn_Shannon_genotype$res);CLD_Archaeal_Dunn_Shannon_genotype 
+
+```
 
 
 

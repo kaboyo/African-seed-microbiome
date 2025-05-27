@@ -1,0 +1,11 @@
+.y.,group1,group2,n1,n2,statistic,p,p.adj,p.adj.signif
+Shannon,Amaranthus hybridus,Celosiea argentea,6,6,1.1866111313364178,0.2353810431656964,1,ns
+Shannon,Amaranthus hybridus,Corchorus olitorius,6,6,-2.0680936860434715,0.038631214317411205,0.38631214317411205,ns
+Shannon,Amaranthus hybridus,Solanum macrocarpon,6,5,-0.7758098206022831,0.43786128456296636,1,ns
+Shannon,Amaranthus hybridus,Telfairia occidentalis,6,6,-3.3564143429230113,7.896017577199875e-4,0.007896017577199875,**
+Shannon,Celosiea argentea,Corchorus olitorius,6,6,-3.2547048173798894,0.0011351027813356518,0.011351027813356517,*
+Shannon,Celosiea argentea,Solanum macrocarpon,6,5,-1.9071991423139458,0.05649480452802062,0.5649480452802063,ns
+Shannon,Celosiea argentea,Telfairia occidentalis,6,6,-4.543025474259429,5.545254731577327e-6,5.5452547315773266e-5,****
+Shannon,Corchorus olitorius,Solanum macrocarpon,6,5,1.1960401400951863,0.2316808952698956,1,ns
+Shannon,Corchorus olitorius,Telfairia occidentalis,6,6,-1.2883206568795398,0.1976343653332923,1,ns
+Shannon,Solanum macrocarpon,Telfairia occidentalis,5,6,-2.4244056893821346,0.01533346545486521,0.1533346545486521,ns

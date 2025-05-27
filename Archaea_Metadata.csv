@@ -1,4 +1,4 @@
-#SampleID,Sample type ,Genotype,target,Barcode_system
+SampleID,Sample type ,Genotype,target,Barcode_system
 A1_a,seed,Telfairia occidentalis,archaea,CaporasoStyle
 A2_a,seed,Telfairia occidentalis,archaea,CaporasoStyle
 A3_a,seed,Telfairia occidentalis,archaea,CaporasoStyle
