@@ -1,4 +1,4 @@
-#NAME,Sample_type,Genotype,target,Barcode_system
+SampleID,Sample_type,Genotype,target,Barcode_system
 A1_b,seed,Telfairia_occidentalis,16S,CaporasoStyle
 A2_b,seed,Telfairia_occidentalis,16S,CaporasoStyle
 A3_b,seed,Telfairia_occidentalis,16S,CaporasoStyle
