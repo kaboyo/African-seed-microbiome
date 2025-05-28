@@ -553,7 +553,7 @@ dev.off()
 
 
 
-plot_bacterial_Shannon=ggboxplot(Bacterial_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon ASVs", xlab = "Plant genotype")+
+plot_bacterial_Shannon=ggboxplot(Bacterial_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon index", xlab = "Plant genotype")+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
   geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
   theme(panel.grid.major = element_blank(), 
@@ -1033,7 +1033,7 @@ dev.off()
 
 
 
-plot_Fungi_Shannon=ggboxplot(Fungi_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon ASVs", xlab = "Plant genotype")+
+plot_Fungi_Shannon=ggboxplot(Fungi_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon index", xlab = "Plant genotype")+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
   geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
   theme(panel.grid.major = element_blank(), 
@@ -1168,7 +1168,6 @@ save(ps0_Archaea,
 file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Archaea.RData")
 
 ```
-
 
 #clean the data
 ```{r,echo = FALSE,warning = FALSE}
@@ -1413,33 +1412,23 @@ head(df_Genus,20)
 ##Consider the cultivars
 ```{r,echo=FALSE, warning=FALSE}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+ps3_Archaea <- prune_samples(sample_sums(ps3_Archaea) > 0, ps3_Archaea);ps3_Archaea
 library(MicrobiotaProcess)
 
-distme <- get_dist(ps3_Archaea, distmethod ="bray", method="hellinger");distme
+distme <- get_dist(ps3_Archaea, distmethod ="bray", method="hellinger",na.rm = TRUE);distme
 sampleda <- data.frame(sample_data(ps3_Archaea), check.names=FALSE);sampleda
 sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
 sampleda$Genotype <- factor(sampleda$Genotype)
 adores <- adonis2(distme ~ Genotype, 
                   data=sampleda, 
                   permutation=999);adores
-
-#           Df SumOfSqs       R2      F Pr(>F)    
-#Model     4   6.6151 0.85924 38.152  0.001 ***
-#Residual 25   1.0837 0.14076                  
-#Total    29   7.6988 1.00000                  
-#---
+#         Df SumOfSqs      R2     F Pr(>F)  
+#Model     4   2.3954 0.24212 1.837  0.012 *
+#Residual 23   7.4980 0.75788               
+#Total    27   9.8934 1.00000               
 #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
 ###################################################################################################
-###################################################################################################
-```
-
-
-
-#alpha diversity
-```{r}
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
-library(MicrobiotaProcess)
-
 # "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
 pcares <- get_pca(obj=ps3_Archaea, method="hellinger");pcares# for PCA ordination to show sample distribution
 pcoares <- get_pcoa(obj=ps3_Archaea, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
@@ -1481,13 +1470,56 @@ ggsave("PCOA_Archaea_cultitvars.tiff", plot = PCOA_Archaea_cultitvars.tiff)
 dev.off()
 ```
 
+#Beta diversity
+
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
+  # require(metagenomeSeq)
+  MGS <- phyloseq::phyloseq_to_metagenomeSeq(physeq)
+  # get the normalized count matrix
+  otu_norm <- metagenomeSeq::MRcounts(MGS, norm = norm, log = log, ...)
+  # exportMat(datt.norm, file = "tmp.txt")    # norm = TRUE, log = TRUE
+  ## save sample statistics (sample scaling factor, quantile value, number of identified features and library size):
+  # exportStats(dattM.sf, file = "tmp_stats.txt")
+  # Substitue raw abundance to the css-normalized data
+  physeq.tr <- physeq
+  phyloseq::otu_table(physeq.tr) <- phyloseq::otu_table(otu_norm, taxa_are_rows = T)
+  return(physeq.tr)
+}
+```
+
+
+#beta diversity
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+ps3_Archaea <- prune_samples(sample_sums(ps3_Archaea) > 0, ps3_Archaea);ps3_Archaea
+ps3_Archaea_css = phyloseq_transform_css(ps3_Archaea);ps3_Archaea_css#########
+#First get otu_table and transpose it:
+dist.matrix_ps3_Archaea_css <- t(data.frame(otu_table(ps3_Archaea_css)))
+sampledf_ps3_Archaea_css <- data.frame(sample_data(ps3_Archaea_css))
+#Then use vegdist from vegan to generate a bray distance object:
+phyloseq_bray_ps3_Archaea_css <- vegdist(dist.matrix_ps3_Archaea_css, method = "bray",na.rm = TRUE); phyloseq_bray_ps3_Archaea_css
+sampleda <- data.frame(sample_data(ps3_Archaea_css), check.names=FALSE);sampleda
+sampleda <- sampleda[match(colnames(as.matrix(phyloseq_bray_ps3_Archaea_css)),rownames(sampleda)),,drop=FALSE];sampleda
+sampleda$Genotype <- factor(sampleda$Genotype)
+
+#         Df SumOfSqs      R2      F Pr(>F)  
+#Model     4   2.2618 0.23438 1.7603  0.019 *
+#Residual 23   7.3882 0.76562                
+#Total    27   9.6500 1.00000                
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#############################
+```
+
+
 
 
 #alpha diversity
 ```{r}
  load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
 
-Archaea_subsamp <- rarefy_even_depth(ps3_Archaea, sample.size=5500  , rngseed=5163, replace=FALSE, trimOTUs=TRUE);Archaea_subsamp#[ 1128 samples by 20 sample variables ]
+Archaea_subsamp <- rarefy_even_depth(ps3_Archaea, sample.size=45  , rngseed=5163, replace=FALSE, trimOTUs=TRUE);Archaea_subsamp#[ 1128 samples by 20 sample variables ]
 Archaea_richness = estimate_richness(Archaea_subsamp , measures=c("Observed","Shannon"))
 Archaea_richness_table <- as.data.frame(as.matrix(Archaea_richness))
 write.csv(Archaea_richness_table,file = "Archaea_richness_table.csv")
@@ -1522,7 +1554,7 @@ dev.off()
 
 
 
-plot_Archaea_Shannon=ggboxplot(Archaea_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon ASVs", xlab = "Plant genotype")+
+plot_Archaea_Shannon=ggboxplot(Archaea_richness, x = "Genotype", y = "Shannon",fill  = "Genotype", ylab = "Shannon index", xlab = "Plant genotype")+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
   geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
   theme(panel.grid.major = element_blank(), 
@@ -1549,23 +1581,23 @@ dev.off()
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 
 Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
-attach(Archaeal_richness)
+attach(Archaea_richness)
 
 #Consider microbial richness
 #Normality
 shapiro.test(Observed)
-#W = 0.92561, p-value = 0.04239
+#W = 0.8717, p-value = 0.01898
 
 #statistics measures for the different Archaeal indices
-kruskal.test(Observed ~ Genotype, data = Archaeal_richness)
+kruskal.test(Observed ~ Genotype, data = Archaea_richness)
 
 #data:  Observed by Genotype
-#Kruskal-Wallis chi-squared = 23.146, df = 4, p-value = 0.0001184
+#Kruskal-Wallis chi-squared = 4.6505, df = 4, p-value = 0.3251
 
 #Post-hoc (Dunn's tests)
 
 # Region of tomato seed production
-Archaeal_Dunn_observed_genotype=dunn_test(Archaeal_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_observed_genotype
+Archaeal_Dunn_observed_genotype=dunn_test(Archaea_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_observed_genotype
 write_csv(Archaeal_Dunn_observed_genotype, "Archaeal_Dunn_observed_genotype.csv")
 Archaeal_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Archaeal_Dunn_observed_genotype
 # Obtaining significance letters
@@ -1573,35 +1605,40 @@ library(rcompanion)
 CLD_Archaeal_Dunn_observed_genotype = cldList(P.adj ~ Comparison, data=Archaeal_Dunn_observed_genotype$res);CLD_Archaeal_Dunn_observed_genotype 
 ```
 
-
 #Archaeal diversity
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 
 Archaea_richness <- read.table("Archaea_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Archaea_richness
-attach(Archaeal_richness)
+attach(Archaea_richness)
 
 #Consider microbial Shannon
 #Normality
 shapiro.test(Shannon)
-#W = 0.91522, p-value = 0.02311
+#W = 0.95428, p-value = 0.4961
 
 #statistics measures for the different Archaeal indices
-kruskal.test(Shannon ~ Genotype, data = Archaeal_richness)
+kruskal.test(Shannon ~ Genotype, data = Archaea_richness)
 
 #data:  Shannon by Genotype
-#Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
+#Kruskal-Wallis chi-squared = 2.338, df = 4, p-value = 0.6739
 
 #Post-hoc (Dunn's tests)
 
 # Region of tomato seed production
-Archaeal_Dunn_Shannon_genotype=dunn_test(Archaeal_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_Shannon_genotype
+Archaeal_Dunn_Shannon_genotype=dunn_test(Archaea_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_Shannon_genotype
 write_csv(Archaeal_Dunn_Shannon_genotype, "Archaeal_Dunn_Shannon_genotype.csv")
 Archaeal_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Archaeal_Dunn_Shannon_genotype
 # Obtaining significance letters
 library(rcompanion)
 CLD_Archaeal_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Archaeal_Dunn_Shannon_genotype$res);CLD_Archaeal_Dunn_Shannon_genotype 
 
+```
+
+#Figures
+```{r}
+
+Beta.tiff.tiff=(plot_richness_Fruit_long_diameter+plot_effective_richness_Fruit_long_diameter+plot_Shannon_Fruit_long_diameter+plot_effective_Shannon_Fruit_long_diameter+plot_PD_Fruit_long_diameter+plot_Simpson_Fruit_long_diameter+plot_effective_Simpson_Fruit_long_diameter+plot_evenness_Fruit_long_diameter+ plot_layout(ncol = 2, byrow = FALSE));Beta.tiff.tiff
 ```
 
 

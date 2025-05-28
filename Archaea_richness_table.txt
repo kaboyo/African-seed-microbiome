@@ -1,0 +1,19 @@
+Sample	Observed	Shannon	Genotype
+A1_a	3	1.078552285	Telfairia occidentalis
+A2_a	3	0.780263881	Telfairia occidentalis
+A3_a	4	1.174648525	Telfairia occidentalis
+A4_a	6	1.362651863	Telfairia occidentalis
+A6_a	2	0.392674467	Telfairia occidentalis
+B2_a	4	1.153029927	Amaranthus hybridus
+B5_a	5	1.116855107	Amaranthus hybridus
+C1_a	3	0.287364305	Solanum macrocarpon
+C2_a	5	1.394461106	Solanum macrocarpon
+C3_a	5	1.428890751	Solanum macrocarpon
+C4_a	5	0.899219866	Solanum macrocarpon
+C5_a	3	0.866821938	Solanum macrocarpon
+D2_a	3	0.538456081	Corchorus olitorius
+D3_a	2	0.650818076	Corchorus olitorius
+D4_a	3	0.918908084	Corchorus olitorius
+E1_a	3	0.887628169	Celosiea argentea
+E2_a	3	0.452749295	Celosiea argentea
+E4_a	5	1.123172781	Celosiea argentea
