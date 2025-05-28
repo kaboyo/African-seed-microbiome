@@ -533,7 +533,7 @@ setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome"
 Bacterial_richness <- read.table("Bacterial_richness_table.txt", header=TRUE); Bacterial_richness
 
 plot_bacterial_rich=ggboxplot(Bacterial_richness, x = "Genotype", y = "Observed",fill  = "Genotype", ylab = "Observed ASVs", xlab = "Plant genotype")+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="bottom") +geom_jitter(width = 0.3,alpha=0.2)+
   geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -544,6 +544,11 @@ plot_bacterial_rich=ggboxplot(Bacterial_richness, x = "Genotype", y = "Observed"
         axis.text.y  = element_text( colour="gray33", size=12))+
   theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
   theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_bacterial_rich
+
+tiff("plot_bacterial_rich.tiff", units="in", width=12, height=3, res=300)
+plot_bacterial_rich.tiff=plot_bacterial_rich+plot_layout(ncol =1 );plot_bacterial_rich.tiff
+ggsave("plot_bacterial_rich.tiff", plot = plot_bacterial_rich.tiff)
+dev.off()
 
 
 tiff("Bacterial_rich.tiff", units="in", width=2, height=3, res=300)
@@ -636,6 +641,62 @@ CLD_Bacterial_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Bacterial
 ```
 
 
+#Bacterial abundance
+
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Bacterial_Abundance <- read.table("Bacteria_abundance.txt", header=TRUE, sep="\t"); Bacterial_Abundance
+
+attach(Bacterial_Abundance)
+variable.names(Bacterial_Abundance)
+Bacterial_Abundance$log10
+head(Bacterial_Abundance)
+str(Bacterial_Abundance)
+
+plot_bacterial_Abundance=ggboxplot(Bacterial_Abundance, x = "Genotype", y = "log10",fill  = "Genotype", ylab = "Log(10) gene copies/gram", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_bacterial_Abundance
+
+
+tiff("Bacterial_abundance.tiff", units="in", width=2, height=3, res=300)
+Bacterial_abundance.tiff=plot_bacterial_Abundance+plot_layout(ncol =1 );Bacterial_abundance.tiff
+ggsave("Bacterial_abundance.tiff", plot = Bacterial_abundance.tiff)
+dev.off()
+
+
+
+#statistics
+#Normality
+shapiro.test(log10)
+#W = 0.85632, p-value = 0.001029
+
+#statistics measures for the different bacterial indices
+kruskal.test(log10 ~ Genotype, data = Bacterial_Abundance)
+
+#data:  log10 by Genotype
+#Kruskal-Wallis chi-squared = 26.184, df = 4, p-value = 2.905e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Bacterial_Dunn_log10_genotype=dunn_test(Bacterial_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Bacterial_Dunn_log10_genotype
+write_csv(Bacterial_Dunn_log10_genotype, "Bacterial_Dunn_log10_genotype.csv")
+Bacterial_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Bacterial_Dunn_log10_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Bacterial_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Bacterial_Dunn_log10_genotype$res);CLD_Bacterial_Dunn_log10_genotype 
+
+```
 
 #Fungal community
 
@@ -1115,6 +1176,64 @@ CLD_Fungi_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungi_Dunn_Sh
 
 ```
 
+
+
+#Fungi abundance
+
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Fungil_Abundance <- read.table("Fungi_abundance.txt", header=TRUE, sep="\t"); Fungil_Abundance
+
+attach(Fungil_Abundance)
+variable.names(Fungil_Abundance)
+Fungil_Abundance$log10
+head(Fungil_Abundance)
+str(Fungil_Abundance)
+
+plot_Fungil_Abundance=ggboxplot(Fungil_Abundance, x = "Genotype", y = "log10",fill  = "Genotype", ylab = "Log(10) gene copies/gram", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungil_Abundance
+
+
+tiff("Fungil_abundance.tiff", units="in", width=2, height=3, res=300)
+Fungil_abundance.tiff=plot_Fungil_Abundance+plot_layout(ncol =1 );Fungil_abundance.tiff
+ggsave("Fungil_abundance.tiff", plot = Fungil_abundance.tiff)
+dev.off()
+
+
+
+#statistics
+#Normality
+shapiro.test(log10)
+#W = 0.85632, p-value = 0.001029
+
+#statistics measures for the different Fungil indices
+kruskal.test(log10 ~ Genotype, data = Fungil_Abundance)
+
+#data:  log10 by Genotype
+#Kruskal-Wallis chi-squared = 26.184, df = 4, p-value = 2.905e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Fungil_Dunn_log10_genotype=dunn_test(Fungil_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_log10_genotype
+write_csv(Fungil_Dunn_log10_genotype, "Fungil_Dunn_log10_genotype.csv")
+Fungil_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Fungil_Dunn_log10_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Fungil_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_log10_genotype$res);CLD_Fungil_Dunn_log10_genotype 
+
+```
 
 
 #Archaeal community
@@ -1635,11 +1754,118 @@ CLD_Archaeal_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Archaeal_D
 
 ```
 
-#Figures
-```{r}
 
-Beta.tiff.tiff=(plot_richness_Fruit_long_diameter+plot_effective_richness_Fruit_long_diameter+plot_Shannon_Fruit_long_diameter+plot_effective_Shannon_Fruit_long_diameter+plot_PD_Fruit_long_diameter+plot_Simpson_Fruit_long_diameter+plot_effective_Simpson_Fruit_long_diameter+plot_evenness_Fruit_long_diameter+ plot_layout(ncol = 2, byrow = FALSE));Beta.tiff.tiff
+#Fungi diversity
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
+attach(Fungi_richness)
+
+#Consider microbial Shannon
+#Normality
+shapiro.test(Shannon)
+#W = 0.91522, p-value = 0.02311
+
+#statistics measures for the different Fungi indices
+kruskal.test(Shannon ~ Genotype, data = Fungi_richness)
+
+#data:  Shannon by Genotype
+#Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Fungi_Dunn_Shannon_genotype=dunn_test(Fungi_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_Shannon_genotype
+write_csv(Fungi_Dunn_Shannon_genotype, "Fungi_Dunn_Shannon_genotype.csv")
+Fungi_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungi_Dunn_Shannon_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Fungi_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungi_Dunn_Shannon_genotype$res);CLD_Fungi_Dunn_Shannon_genotype 
+
 ```
 
+
+#Archaea abundance
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+Archaea_Abundance <- read.table("Archaea_abundance.txt", header=TRUE, sep="\t"); Archaea_Abundance
+
+attach(Archaea_Abundance)
+variable.names(Archaea_Abundance)
+Archaea_Abundance$log10
+head(Archaea_Abundance)
+str(Archaea_Abundance)
+
+plot_Archaea_Abundance=ggboxplot(Archaea_Abundance, x = "Genotype", y = "log10",fill  = "Genotype", ylab = "Log(10) gene copies/gram", xlab = "Plant genotype")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+ theme(legend.position="none") +geom_jitter(width = 0.3,alpha=0.2)+
+  geom_jitter(width = 0.3,alpha=0.2)+theme(text = element_text(size = 8.5)) +scale_color_gradientn(colours = c('grey', 'pink'))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_rect(colour = "gray33", size=0.4))+
+  theme(axis.title.x = element_text(face="bold", colour="gray33", size=12),
+        axis.title.y = element_text(face="bold", colour="gray33", size=12),
+        axis.text.x = element_blank(),
+        axis.text.y  = element_text( colour="gray33", size=12))+
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
+  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_Abundance
+
+
+tiff("Archaea_abundance.tiff", units="in", width=2, height=3, res=300)
+Archaea_abundance.tiff=plot_Archaea_Abundance+plot_layout(ncol =1 );Archaea_abundance.tiff
+ggsave("Archaea_abundance.tiff", plot = Archaea_abundance.tiff)
+dev.off()
+
+
+#statistics
+#Normality
+shapiro.test(log10)
+#W = 0.85632, p-value = 0.001029
+
+#statistics measures for the different Archaea indices
+kruskal.test(log10 ~ Genotype, data = Archaea_Abundance)
+
+#data:  log10 by Genotype
+#Kruskal-Wallis chi-squared = 26.184, df = 4, p-value = 2.905e-05
+
+#Post-hoc (Dunn's tests)
+
+# Region of tomato seed production
+Archaea_Dunn_log10_genotype=dunn_test(Archaea_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaea_Dunn_log10_genotype
+write_csv(Archaea_Dunn_log10_genotype, "Archaea_Dunn_log10_genotype.csv")
+Archaea_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Archaea_Dunn_log10_genotype
+# Obtaining significance letters
+library(rcompanion)
+CLD_Archaea_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Archaea_Dunn_log10_genotype$res);CLD_Archaea_Dunn_log10_genotype 
+```
+
+
+
+
+
+#Figures
+#Rarefaction
+```{r}
+tiff("Rarefaction.tiff", units="in", width=9, height=3.5, res=300)
+Rarefaction.tiff=(Rareaction_Bacteria+Rareaction_Fungi+Rareaction_Archaea+plot_layout(nrow = 1, byrow = FALSE));Rarefaction.tiff
+dev.off()
+```
+
+
+#Alpha_diversity
+```{r}
+tiff("Alpha_diversity.tiff", units="in", width=9, height=5, res=300)
+Alpha_diversity.tiff=(plot_bacterial_rich+plot_bacterial_Shannon+plot_Fungi_rich+plot_Fungi_Shannon+plot_Archaea_rich+plot_Archaea_Shannon+plot_layout(nrow = 2, byrow = FALSE));Alpha_diversity.tiff
+dev.off()
+```
+
+
+#Microbial_anbundance
+```{r}
+tiff("Abundance.tiff", units="in", width=9, height=3, res=300)
+Abundance.tiff=(plot_bacterial_Abundance+plot_Fungil_Abundance+plot_Archaea_Abundance+plot_layout(nrow = 1, byrow = FALSE));Abundance.tiff
+dev.off()
+```
 
 

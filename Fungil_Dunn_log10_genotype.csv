@@ -1,0 +1,11 @@
+.y.,group1,group2,n1,n2,statistic,p,p.adj,p.adj.signif
+log10,Amaranthus hybridus,Celosiea argentea,6,6,-4.361241807963288,1.293263436552777e-5,1.293263436552777e-4,***
+log10,Amaranthus hybridus,Corchorus olitorius,6,6,-1.9346862155626616,0.053028812924633476,0.5302881292463347,ns
+log10,Amaranthus hybridus,Solanum macrocarpon,6,6,-3.1807553035521723,0.0014689164504922219,0.01468916450492222,*
+log10,Amaranthus hybridus,Telfairia occidentalis,6,6,-0.5246606686271627,0.599819103758549,1,ns
+log10,Celosiea argentea,Corchorus olitorius,6,6,2.4265555924006263,0.015242914798721698,0.152429147987217,ns
+log10,Celosiea argentea,Solanum macrocarpon,6,6,1.1804865044111155,0.23780677487832869,1,ns
+log10,Celosiea argentea,Telfairia occidentalis,6,6,3.836581139336125,1.2475898898006013e-4,0.0012475898898006014,**
+log10,Corchorus olitorius,Solanum macrocarpon,6,6,-1.2460690879895109,0.212739032257151,1,ns
+log10,Corchorus olitorius,Telfairia occidentalis,6,6,1.410025546935499,0.15853213961996462,1,ns
+log10,Solanum macrocarpon,Telfairia occidentalis,6,6,2.65609463492501,0.007905142693916744,0.07905142693916745,ns
