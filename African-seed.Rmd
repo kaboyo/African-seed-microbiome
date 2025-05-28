@@ -784,7 +784,7 @@ ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
 print(paste0("Initial #ASVs:", ntaxa(ps1_Fungi), ". #ASVs after prevalence filtering:", ntaxa(ps3_Fungi), ". #ASVs removed: ", ntaxa(ps1_Fungi)-ntaxa(ps3_Fungi)))
 ```
 
-# Save the Fungil object
+# Save the Fungi object
 ```{r}
 save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
 ```
@@ -792,7 +792,7 @@ save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African
 
 
 
-##plot rarefaction curves  for the Fungil community
+##plot rarefaction curves  for the Fungi community
 #code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
 ```{r, echo=FALSE,warning = FALSE}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
@@ -1006,7 +1006,7 @@ Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t"
 ```
 
 
-#Fungil diversity
+#Fungi diversity
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 
@@ -1055,20 +1055,20 @@ dev.off()
 
 
 
-#Fungil diversity
+#Fungi diversity
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 
 Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
-attach(Fungil_richness)
+attach(Fungi_richness)
 
 #Consider microbial richness
 #Normality
 shapiro.test(Observed)
 #W = 0.92561, p-value = 0.04239
 
-#statistics measures for the different Fungil indices
-kruskal.test(Observed ~ Genotype, data = Fungil_richness)
+#statistics measures for the different Fungi indices
+kruskal.test(Observed ~ Genotype, data = Fungi_richness)
 
 #data:  Observed by Genotype
 #Kruskal-Wallis chi-squared = 23.146, df = 4, p-value = 0.0001184
@@ -1076,29 +1076,29 @@ kruskal.test(Observed ~ Genotype, data = Fungil_richness)
 #Post-hoc (Dunn's tests)
 
 # Region of tomato seed production
-Fungil_Dunn_observed_genotype=dunn_test(Fungil_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_observed_genotype
-write_csv(Fungil_Dunn_observed_genotype, "Fungil_Dunn_observed_genotype.csv")
-Fungil_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Fungil_Dunn_observed_genotype
+Fungi_Dunn_observed_genotype=dunn_test(Fungi_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_observed_genotype
+write_csv(Fungi_Dunn_observed_genotype, "Fungi_Dunn_observed_genotype.csv")
+Fungi_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Fungi_Dunn_observed_genotype
 # Obtaining significance letters
 library(rcompanion)
-CLD_Fungil_Dunn_observed_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_observed_genotype$res);CLD_Fungil_Dunn_observed_genotype 
+CLD_Fungi_Dunn_observed_genotype = cldList(P.adj ~ Comparison, data=Fungi_Dunn_observed_genotype$res);CLD_Fungi_Dunn_observed_genotype 
 ```
 
 
-#Fungil diversity
+#Fungi diversity
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 
 Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
-attach(Fungil_richness)
+attach(Fungi_richness)
 
 #Consider microbial Shannon
 #Normality
 shapiro.test(Shannon)
 #W = 0.91522, p-value = 0.02311
 
-#statistics measures for the different Fungil indices
-kruskal.test(Shannon ~ Genotype, data = Fungil_richness)
+#statistics measures for the different Fungi indices
+kruskal.test(Shannon ~ Genotype, data = Fungi_richness)
 
 #data:  Shannon by Genotype
 #Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
@@ -1106,12 +1106,12 @@ kruskal.test(Shannon ~ Genotype, data = Fungil_richness)
 #Post-hoc (Dunn's tests)
 
 # Region of tomato seed production
-Fungil_Dunn_Shannon_genotype=dunn_test(Fungil_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_Shannon_genotype
-write_csv(Fungil_Dunn_Shannon_genotype, "Fungil_Dunn_Shannon_genotype.csv")
-Fungil_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungil_Dunn_Shannon_genotype
+Fungi_Dunn_Shannon_genotype=dunn_test(Fungi_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_Shannon_genotype
+write_csv(Fungi_Dunn_Shannon_genotype, "Fungi_Dunn_Shannon_genotype.csv")
+Fungi_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungi_Dunn_Shannon_genotype
 # Obtaining significance letters
 library(rcompanion)
-CLD_Fungil_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_Shannon_genotype$res);CLD_Fungil_Dunn_Shannon_genotype 
+CLD_Fungi_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungi_Dunn_Shannon_genotype$res);CLD_Fungi_Dunn_Shannon_genotype 
 
 ```
 
