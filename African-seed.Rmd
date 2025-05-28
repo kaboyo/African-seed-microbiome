@@ -376,9 +376,9 @@ theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
   theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
 
 library(ggpubr)
-tiff("Composition_Genotype_bact.tiff.tiff", units="in", width=11, height=5, res=300)
-Composition_Genotype_bact.tiff.tiff=gg1+plot_layout(nrow = 1);Composition_Genotype_bact.tiff.tiff
-ggsave("Composition_Genotype_bact.tiff.tiff", plot = Composition_Genotype_bact.tiff.tiff)
+tiff("Composition_Genotype_bact.tiff", units="in", width=11, height=5, res=300)
+Composition_Genotype_bact.tiff=gg1+plot_layout(nrow = 1);Composition_Genotype_bact.tiff
+ggsave("Composition_Genotype_bact.tiff", plot = Composition_Genotype_bact.tiff)
 dev.off()
 
 
@@ -398,9 +398,9 @@ theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
   theme(text=element_text(size=8,  family="Arial"))+ labs(tag = "");gg1
 
 library(ggpubr)
-tiff("Order_Composition_Genotype_bact.tiff.tiff", units="in", width=14, height=5, res=300)
-Order_Composition_Genotype_bact.tiff.tiff=gg1+plot_layout(nrow = 1);Order_Composition_Genotype_bact.tiff.tiff
-ggsave("Order_Composition_Genotype_bact.tiff.tiff", plot = Order_Composition_Genotype_bact.tiff.tiff)
+tiff("Order_Composition_Genotype_bact.tiff", units="in", width=14, height=5, res=300)
+Order_Composition_Genotype_bact.tiff=gg1+plot_layout(nrow = 1);Order_Composition_Genotype_bact.tiff
+ggsave("Order_Composition_Genotype_bact.tiff", plot = Order_Composition_Genotype_bact.tiff)
 dev.off()
 
 ```
@@ -476,7 +476,7 @@ pcares <- get_pca(obj=ps3_Bacteria, method="hellinger");pcares# for PCA ordinati
 pcoares <- get_pcoa(obj=ps3_Bacteria, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
 
 ##Plot PCoA considering the cultivars
-pcaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+pcaplot1_bacteria.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
                        factorNames=c("Genotype"), ellips3_Bacteriae=F)+
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
@@ -487,11 +487,11 @@ pcaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, spec
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_bacteria.tiff.tiff
-#ggsave("pcaplot1_bacteria.tiff.TIFF", plot = pcaplot1_bacteria.tiff)
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_bacteria.tiff
+#ggsave("pcaplot1_bacteria.tiff", plot = pcaplot1_bacteria.tiff)
 # pc = c(1, 3) to show the first & third principal components.
 
-pcoaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+pcoaplot1_bacteria.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
                         factorNames=c("Genotype"), ellips3_Bacteriae=F) +
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
@@ -502,12 +502,12 @@ pcoaplot1_bacteria.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_bacteria.tiff.tiff
-#ggsave("pcoaplot1_bacteria.tiff.tiff.TIFF", plot = pcoaplot1_bacteria.tiff.tiff);pcoaplot1_bacteria.tiff.tiff
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_bacteria.tiff
+#ggsave("pcoaplot1_bacteria.tiff.TIFF", plot = pcoaplot1_bacteria.tiff);pcoaplot1_bacteria.tiff
 
 #Combine the figures
 tiff("PCOA_Bacteria_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Bacteria_cultitvars.tiff=pcaplot1_bacteria.tiff.tiff+pcoaplot1_bacteria.tiff.tiff+plot_layout(ncol = 2);PCOA_Bacteria_cultitvars.tiff
+PCOA_Bacteria_cultitvars.tiff=pcaplot1_bacteria.tiff+pcoaplot1_bacteria.tiff+plot_layout(ncol = 2);PCOA_Bacteria_cultitvars.tiff
 ggsave("PCOA_Bacteria_cultitvars.tiff", plot = PCOA_Bacteria_cultitvars.tiff)
 dev.off()
 ###################################################################################################
@@ -1017,7 +1017,7 @@ pcares <- get_pca(obj=ps3_Fungi, method="hellinger");pcares# for PCA ordination 
 pcoares <- get_pcoa(obj=ps3_Fungi, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
 
 ##Plot PCoA considering the cultivars
-pcaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+pcaplot1_fungi.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
                        factorNames=c("Genotype"), ellips3_Fungie=F)+
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
@@ -1028,11 +1028,11 @@ pcaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, species
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_fungi.tiff.tiff
-#ggsave("pcaplot1_fungi.tiff.tiff", plot = pcaplot1)
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_fungi.tiff
+#ggsave("pcaplot1_fungi.tiff", plot = pcaplot1)
 # pc = c(1, 3) to show the first & third principal components.
 
-pcoaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+pcoaplot1_fungi.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
                         factorNames=c("Genotype"), ellips3_Fungie=F) +
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
@@ -1043,12 +1043,12 @@ pcoaplot1_fungi.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_fungi.tiff.tiff
-#ggsave("pcoaplot1_fungi.tiff.tiff.TIFF", plot = pcoaplot1_fungi.tiff.tiff);pcoaplot1_fungi.tiff.tiff
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_fungi.tiff
+#ggsave("pcoaplot1_fungi.tiff.TIFF", plot = pcoaplot1_fungi.tiff);pcoaplot1_fungi.tiff
 
 #Combine the figures
 tiff("PCOA_Fungi_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Fungi_cultitvars.tiff=pcaplot1_fungi.tiff.tiff+pcoaplot1_fungi.tiff.tiff+plot_layout(ncol = 2);PCOA_Fungi_cultitvars.tiff
+PCOA_Fungi_cultitvars.tiff=pcaplot1_fungi.tiff+pcoaplot1_fungi.tiff+plot_layout(ncol = 2);PCOA_Fungi_cultitvars.tiff
 ggsave("PCOA_Fungi_cultitvars.tiff", plot = PCOA_Fungi_cultitvars.tiff)
 dev.off()
 ###################################################################################################
@@ -1553,7 +1553,7 @@ pcares <- get_pca(obj=ps3_Archaea, method="hellinger");pcares# for PCA ordinatio
 pcoares <- get_pcoa(obj=ps3_Archaea, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
 
 ##Plot PCoA considering the cultivars
-pcaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
+pcaplot1_Archaea.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
                        factorNames=c("Genotype"), ellips3_Archaeae=F)+
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
@@ -1564,11 +1564,11 @@ pcaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speci
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_Archaea.tiff.tiff
-#ggsave("pcaplot1_Archaea.tiff.tiff", plot = pcaplot1)
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_Archaea.tiff
+#ggsave("pcaplot1_Archaea.tiff", plot = pcaplot1)
 # pc = c(1, 3) to show the first & third principal components.
 
-pcoaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
+pcoaplot1_Archaea.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
                         factorNames=c("Genotype"), ellips3_Archaeae=F) +
   scale_fill_manual(values=mycola)+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
@@ -1579,12 +1579,12 @@ pcoaplot1_Archaea.tiff.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
         axis.text.y = element_text(size=12, face="bold", color = "black"))+
   theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
   theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_Archaea.tiff.tiff
-#ggsave("pcoaplot1_Archaea.tiff.tiff.TIFF", plot = pcoaplot1_Archaea.tiff.tiff);pcoaplot1_Archaea.tiff.tiff
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_Archaea.tiff
+#ggsave("pcoaplot1_Archaea.tiff.TIFF", plot = pcoaplot1_Archaea.tiff);pcoaplot1_Archaea.tiff
 
 #Combine the figures
 tiff("PCOA_Archaea_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Archaea_cultitvars.tiff=pcaplot1_Archaea.tiff.tiff+pcoaplot1_Archaea.tiff.tiff+plot_layout(ncol = 2);PCOA_Archaea_cultitvars.tiff
+PCOA_Archaea_cultitvars.tiff=pcaplot1_Archaea.tiff+pcoaplot1_Archaea.tiff+plot_layout(ncol = 2);PCOA_Archaea_cultitvars.tiff
 ggsave("PCOA_Archaea_cultitvars.tiff", plot = PCOA_Archaea_cultitvars.tiff)
 dev.off()
 ```
@@ -1755,37 +1755,6 @@ CLD_Archaeal_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Archaeal_D
 ```
 
 
-#Fungi diversity
-```{r}
-setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
-
-Fungi_richness <- read.table("Fungi_richness_table.txt", header=TRUE, sep = "\t",row.names="Sample"); Fungi_richness
-attach(Fungi_richness)
-
-#Consider microbial Shannon
-#Normality
-shapiro.test(Shannon)
-#W = 0.91522, p-value = 0.02311
-
-#statistics measures for the different Fungi indices
-kruskal.test(Shannon ~ Genotype, data = Fungi_richness)
-
-#data:  Shannon by Genotype
-#Kruskal-Wallis chi-squared = 25.005, df = 4, p-value = 5.02e-05
-
-#Post-hoc (Dunn's tests)
-
-# Region of tomato seed production
-Fungi_Dunn_Shannon_genotype=dunn_test(Fungi_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_Shannon_genotype
-write_csv(Fungi_Dunn_Shannon_genotype, "Fungi_Dunn_Shannon_genotype.csv")
-Fungi_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungi_Dunn_Shannon_genotype
-# Obtaining significance letters
-library(rcompanion)
-CLD_Fungi_Dunn_Shannon_genotype = cldList(P.adj ~ Comparison, data=Fungi_Dunn_Shannon_genotype$res);CLD_Fungi_Dunn_Shannon_genotype 
-
-```
-
-
 #Archaea abundance
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
@@ -1862,6 +1831,15 @@ dev.off()
 
 
 #Microbial_anbundance
+```{r}
+tiff("Abundance.tiff", units="in", width=9, height=3, res=300)
+Abundance.tiff=(plot_bacterial_Abundance+plot_Fungil_Abundance+plot_Archaea_Abundance+plot_layout(nrow = 1, byrow = FALSE));Abundance.tiff
+dev.off()
+```
+
+
+
+#Beta diversity
 ```{r}
 tiff("Abundance.tiff", units="in", width=9, height=3, res=300)
 Abundance.tiff=(plot_bacterial_Abundance+plot_Fungil_Abundance+plot_Archaea_Abundance+plot_layout(nrow = 1, byrow = FALSE));Abundance.tiff
