@@ -483,12 +483,11 @@ ggsave(
    "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_bacteria_Genus.tiff",     
  plot = upset_bacteria_Genus,
   scale = 1,
-  width = 17,
+  width = 18,
  height = 11,
  units = c("cm"),
   dpi = 600)
 ```
-
 
 
 
@@ -1024,6 +1023,8 @@ ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
 print(paste0("Initial #ASVs:", ntaxa(ps1_Fungi), ". #ASVs after prevalence filtering:", ntaxa(ps3_Fungi), ". #ASVs removed: ", ntaxa(ps1_Fungi)-ntaxa(ps3_Fungi)))
 ```
 
+
+
 # Save the Fungi object
 ```{r}
 save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
@@ -1149,6 +1150,67 @@ p_core_flex1_all_Fungi <-
   units = c("cm"),
  dpi = 600)
 ```
+
+
+
+
+#comsider order level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Fungi)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Fungi, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Fungi), decreasing=TRUE))[1:100];toptax
+ps.toptax_Fungi = transform_sample_counts(ps3_Fungi, function(x) {x/sum(x)*100});ps.toptax_Fungi
+ps.toptax_Fungi <- prune_taxa(toptax, ps.toptax_Fungi);ps.toptax_Fungi
+upset_Fungi_Order=upset_pq(ps.toptax_Fungi, "Genotype", taxa = "Order");upset_Fungi_Order
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_Fungi_Order.tiff",     
+  plot = upset_Fungi_Order,
+  scale = 1,
+  width = 20,
+ height = 11,
+ units = c("cm"),
+  dpi = 600)
+```
+
+
+
+#consider the genus level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+#https://adrientaudiere.github.io/MiscMetabar/articles/MiscMetabar.html
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Fungi)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Fungi, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Fungi), decreasing=TRUE))[1:25];toptax
+ps.toptax_Fungi = transform_sample_counts(ps3_Fungi, function(x) {x/sum(x)*100});ps.toptax_Fungi
+ps.toptax_Fungi <- prune_taxa(toptax, ps.toptax_Fungi);ps.toptax_Fungi
+upset_Fungi_Genus=upset_pq(ps.toptax_Fungi, "Genotype", taxa = "Genus");upset_Fungi_Genus
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_Fungi_Genus.tiff",     
+ plot = upset_Fungi_Genus,
+  scale = 1,
+  width = 18,
+ height = 11,
+ units = c("cm"),
+  dpi = 600)
+```
+
+
+
 
 
 ##plot rarefaction curves  for the Fungi community
