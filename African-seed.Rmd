@@ -434,9 +434,73 @@ p_core_flex1_all_bacteria <-
 ```
 
 
+#comsider order level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Bacteria)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Bacteria, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Bacteria), decreasing=TRUE))[1:100];toptax
+ps.toptax_Bacteria = transform_sample_counts(ps3_Bacteria, function(x) {x/sum(x)*100});ps.toptax_Bacteria
+ps.toptax_Bacteria <- prune_taxa(toptax, ps.toptax_Bacteria);ps.toptax_Bacteria
+upset_bacteria_Order=upset_pq(ps.toptax_Bacteria, "Genotype", taxa = "Order");upset_bacteria_Order
+
+#ggsave(
+ #  "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_bacteria_Orde#r.tiff",     
+#  plot = upset_bacteria_Order,
+#  scale = 1,
+ # width = 17,
+ #height = 11,
+ #units = c("cm"),
+  #dpi = 600)
+```
 
 
 
+#consider the genus level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+#https://adrientaudiere.github.io/MiscMetabar/articles/MiscMetabar.html
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Bacteria)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Bacteria, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Bacteria), decreasing=TRUE))[1:25];toptax
+ps.toptax_Bacteria = transform_sample_counts(ps3_Bacteria, function(x) {x/sum(x)*100});ps.toptax_Bacteria
+ps.toptax_Bacteria <- prune_taxa(toptax, ps.toptax_Bacteria);ps.toptax_Bacteria
+upset_bacteria_Genus=upset_pq(ps.toptax_Bacteria, "Genotype", taxa = "Genus");upset_bacteria_Genus
+
+upset_bacteria_Genus+scale_fill_manual(values = mycolors)
+
+#ggsave(
+#   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_bacteria_Gen#us.tiff",     
+#  plot = upset_bacteria_Genus,
+ # scale = 1,
+ # width = 17,
+ #height = 11,
+ #units = c("cm"),
+ # dpi = 600)
+
+#combine
+
+
+
+#Shared-bacterial  Microbiome archaea
+```{r}
+tiff("Core_Microbiome_archaea.tiff", units="in", width=9, height=5, res=300)
+Core_Microbiome_archaea.tiff=(p_core_flex1_all_Archaea+plot_layout(nrow = 1, byrow = FALSE));Core_Microbiome_archaea.tiff
+dev.off()
+```
+```
 
 
 
@@ -980,6 +1044,125 @@ save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African
 
 
 
+## Ab-Prev prep
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+
+meta <- microbiome::meta(ps3_Fungi) # x_bac
+asv <- otu_table(ps3_Fungi) # x_bac
+taxo <- rownames_to_column(as.data.frame(tax_table(ps3_Fungi)),
+                                        "ASV") # x_bac
+sample_names(ps3_Fungi)
+# presence-absence data
+asv_PA <- 1 * ((asv > 0) == 1)
+
+# occupancy calculation
+asv_prev <- rowSums(asv_PA) / ncol(asv_PA)
+
+# relative abundance
+asv_rel <- apply(vegan::decostand(asv, 
+                                  method = "total", 
+                                  MARGIN = 2), 1, mean)
+
+# combine occupancy and RA of each ASV in a table
+asv_prev_rel <- rownames_to_column(as.data.frame(cbind(asv_prev, 
+                                                       asv_rel)),
+                                   "ASV")
+
+asv_prev_rel_taxo <- merge(taxo, 
+                           asv_prev_rel, 
+                           by = "ASV")
+
+# merge with metadata
+asv_tdf <- rownames_to_column(as.data.frame(t(asv)),
+                           "replicates")
+library(dplyr)
+meta <- meta %>% rename(replicates = 1)
+colnames(meta)
+
+colnames(asv_tdf)
+asv_tdf_meta <- merge(meta,
+                      asv_tdf, 
+                      by = "replicates")
+
+# keep only the one feature column for collaps3_Fungiing table
+asv_tdf_meta <- asv_tdf_meta[-c(1, 3:29)]
+
+asv_gen <- asv_tdf_meta %>% 
+    group_by(Genotype) %>%
+  summarise_each(list(sum))
+
+# make a ASV P/A table
+asv_gen_PA <- 1 * ((asv_gen > 0) == 1)
+
+# merge prevalence, RA and taxa with the nr of obs per genotype
+asv_gen_obs <- data.frame(colSums(asv_gen_PA)) %>%
+  na.omit() %>% 
+  rownames_to_column("ASV")
+names(asv_gen_obs)[names(asv_gen_obs) == "colSums.asv_gen_PA."] <- 'Obs'
+
+asv_prev_rel_taxo_gen_obs <- merge(asv_prev_rel_taxo, 
+                                   asv_gen_obs, 
+                                   by = "ASV")
+```
+
+## Ab-Prev Plot 
+```{r}
+counts <- asv_prev_rel_taxo_gen_obs %>% dplyr::count(Kingdom = "Fungi")
+
+p_core_flex1_all_Fungi <- 
+  ggplot(asv_prev_rel_taxo_gen_obs, 
+         aes(x = asv_rel, y = asv_prev, size = Obs)) +
+  geom_point(
+    color = "darkgrey",
+    alpha = 0.5) + 
+  ggrepel::geom_text_repel(data = subset(asv_prev_rel_taxo_gen_obs, asv_prev > 0.5),
+                           max.overlaps3_Fungi = 20,
+                           aes(asv_rel,
+                               asv_prev,
+                               label = Genus),
+                           size = 3,
+                           show.legend = F) +
+  geom_text(data = counts,
+            aes(x = 0.00000001, y = 0.1, 
+                label = paste0("Total ASVs\n", n),  
+                fontface = "bold"), size = 4) +
+  geom_hline(yintercept = 0.9, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.7, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.5, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.25, linetype = "dotted", color = "red") +
+  geom_vline(xintercept = 0.00005, linetype = "dotted", color = "red", show.legend = T) +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.5, unit = "cm"),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text = element_text(size = 12),
+    axis.line = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = c(0.35, 0.95),
+    legend.direction = "horizontal",
+    legend.background = element_rect(fill = "transparent", color = "transparent"),
+    legend.margin = margin(0, 0, 0, 0),
+    panel.spacing = unit(0.1, "lines")) +
+  scale_x_log10(breaks = c(0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001), 
+                labels = c(10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001)) +
+  scale_y_continuous(limits = c(-0.01, 1.01),
+                     breaks = c(0,0.25, 0.5, 0.7, 0.9),
+                     labels = c(0,25, 50, 70, 90)) +
+  labs(x = "Relative abundance [%]", y = "Prevalence [%]", size = "nº cultivars"); p_core_flex1_all_Fungi
+
+ ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ab-prev-all_Fungi.tiff",     
+  plot = p_core_flex1_all_Fungi,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
+```
+
+
 ##plot rarefaction curves  for the Fungi community
 #code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
 ```{r, echo=FALSE,warning = FALSE}
@@ -1508,6 +1691,128 @@ ggplot(prevdf1, aes(TotalAbundance, Prevalence, color = Phylum)) +
 print(paste0("Initial #ASVs:", ntaxa(ps1_Archaea), ". #ASVs after prevalence filtering:", ntaxa(ps3_Archaea), ". #ASVs removed: ", ntaxa(ps1_Archaea)-ntaxa(ps3_Archaea)))
 ```
 
+
+
+
+## Ab-Prev prep
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+
+meta <- microbiome::meta(ps3_Archaea) # x_bac
+asv <- otu_table(ps3_Archaea) # x_bac
+taxo <- rownames_to_column(as.data.frame(tax_table(ps3_Archaea)),
+                                        "ASV") # x_bac
+sample_names(ps3_Archaea)
+# presence-absence data
+asv_PA <- 1 * ((asv > 0) == 1)
+
+# occupancy calculation
+asv_prev <- rowSums(asv_PA) / ncol(asv_PA)
+
+# relative abundance
+asv_rel <- apply(vegan::decostand(asv, 
+                                  method = "total", 
+                                  MARGIN = 2), 1, mean)
+
+# combine occupancy and RA of each ASV in a table
+asv_prev_rel <- rownames_to_column(as.data.frame(cbind(asv_prev, 
+                                                       asv_rel)),
+                                   "ASV")
+
+asv_prev_rel_taxo <- merge(taxo, 
+                           asv_prev_rel, 
+                           by = "ASV")
+
+# merge with metadata
+asv_tdf <- rownames_to_column(as.data.frame(t(asv)),
+                           "replicates")
+library(dplyr)
+meta <- meta %>% rename(replicates = 1)
+colnames(meta)
+
+colnames(asv_tdf)
+asv_tdf_meta <- merge(meta,
+                      asv_tdf, 
+                      by = "replicates")
+
+# keep only the one feature column for collaps3_Archaeaing table
+asv_tdf_meta <- asv_tdf_meta[-c(1, 3:29)]
+
+asv_gen <- asv_tdf_meta %>% 
+    group_by(Genotype) %>%
+  summarise_each(list(sum))
+
+# make a ASV P/A table
+asv_gen_PA <- 1 * ((asv_gen > 0) == 1)
+
+# merge prevalence, RA and taxa with the nr of obs per genotype
+asv_gen_obs <- data.frame(colSums(asv_gen_PA)) %>%
+  na.omit() %>% 
+  rownames_to_column("ASV")
+names(asv_gen_obs)[names(asv_gen_obs) == "colSums.asv_gen_PA."] <- 'Obs'
+
+asv_prev_rel_taxo_gen_obs <- merge(asv_prev_rel_taxo, 
+                                   asv_gen_obs, 
+                                   by = "ASV")
+```
+
+## Ab-Prev Plot 
+```{r}
+counts <- asv_prev_rel_taxo_gen_obs %>% dplyr::count(Kingdom = "Archaea")
+
+p_core_flex1_all_Archaea <- 
+  ggplot(asv_prev_rel_taxo_gen_obs, 
+         aes(x = asv_rel, y = asv_prev, size = Obs)) +
+  geom_point(
+    color = "darkgrey",
+    alpha = 0.5) + 
+  ggrepel::geom_text_repel(data = subset(asv_prev_rel_taxo_gen_obs, asv_prev > 0.5),
+                           max.overlaps3_Archaea = 20,
+                           aes(asv_rel,
+                               asv_prev,
+                               label = Genus),
+                           size = 3,
+                           show.legend = F) +
+  geom_text(data = counts,
+            aes(x = 0.00000001, y = 0.1, 
+                label = paste0("Total ASVs\n", n),  
+                fontface = "bold"), size = 4) +
+  geom_hline(yintercept = 0.9, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.7, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.5, linetype = "dotted", color = "red") +
+  geom_hline(yintercept = 0.25, linetype = "dotted", color = "red") +
+  geom_vline(xintercept = 0.00005, linetype = "dotted", color = "red", show.legend = T) +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 0.5, r = 0.5, b = 0.5, l = 0.5, unit = "cm"),
+    axis.title.x = element_text(size = 12),
+    axis.title.y = element_text(size = 12),
+    axis.text = element_text(size = 12),
+    axis.line = element_blank(),
+    legend.text = element_text(size = 12),
+    legend.position = c(0.35, 0.95),
+    legend.direction = "horizontal",
+    legend.background = element_rect(fill = "transparent", color = "transparent"),
+    legend.margin = margin(0, 0, 0, 0),
+    panel.spacing = unit(0.1, "lines")) +
+  scale_x_log10(breaks = c(0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001, 0.0000001), 
+                labels = c(10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001)) +
+  scale_y_continuous(limits = c(-0.01, 1.01),
+                     breaks = c(0,0.25, 0.5, 0.7, 0.9),
+                     labels = c(0,25, 50, 70, 90)) +
+  labs(x = "Relative abundance [%]", y = "Prevalence [%]", size = "nº cultivars"); p_core_flex1_all_Archaea
+
+ ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ab-prev-all_Archaea.tiff",     
+  plot = p_core_flex1_all_Archaea,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
+```
+
+
 # Save the Archaeal object
 ```{r}
 save(ps3_Archaea, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
@@ -1550,6 +1855,7 @@ tiff("p_Archaea.tiff", units="in", width=12, height=5, res=300)
 ggsave("p_Archaea.tiff", plot = Rareaction_Archaea)
 
 ```
+
 
 #Transformed to relative abundances 
 #bar blot of the seed microbiome composition in the different cukltivars at the various locations for the top500 ASVs
@@ -1965,7 +2271,6 @@ dev.off()
 ```
 
 
-
 #Beta diversity
 ```{r}
 tiff("Beta_diversity.tiff.tiff", units="in", width=9, height=5, res=300)
@@ -1973,7 +2278,20 @@ Beta_diversity.tiff.tiff=(pcaplot1_bacteria.tiff+pcoaplot1_bacteria.tiff+pcaplot
 dev.off()
 ```
 
+#core Microbiome 
+```{r}
+tiff("Core_Microbiome.tiff", units="in", width=9, height=5, res=300)
+Core_Microbiome.tiff=(p_core_flex1_all_bacteria+p_core_flex1_all_Fungi+plot_layout(nrow = 1, byrow = FALSE));Core_Microbiome.tiff
+dev.off()
+```
 
-#d
+
+#core Microbiome archaea
+```{r}
+tiff("Core_Microbiome_archaea.tiff", units="in", width=9, height=5, res=300)
+Core_Microbiome_archaea.tiff=(p_core_flex1_all_Archaea+plot_layout(nrow = 1, byrow = FALSE));Core_Microbiome_archaea.tiff
+dev.off()
+```
+
 
 
