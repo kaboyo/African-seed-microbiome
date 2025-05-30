@@ -718,8 +718,7 @@ plot_bacterial_rich=ggboxplot(Bacterial_richness, x = "Genotype", y = "Observed"
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_bacterial_rich
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_bacterial_rich
 
 tiff("plot_bacterial_rich.tiff", units="in", width=12, height=3, res=300)
 plot_bacterial_rich.tiff=plot_bacterial_rich+plot_layout(ncol =1 );plot_bacterial_rich.tiff
@@ -744,8 +743,7 @@ plot_bacterial_Shannon=ggboxplot(Bacterial_richness, x = "Genotype", y = "Shanno
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_bacterial_Shannon
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_bacterial_Shannon
 
 
 tiff("Bacterial_Shannon.tiff", units="in", width=2, height=3, res=300)
@@ -840,8 +838,7 @@ plot_bacterial_Abundance=ggboxplot(Bacterial_Abundance, x = "Genotype", y = "log
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_bacterial_Abundance
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_bacterial_Abundance
 
 
 tiff("Bacterial_abundance.tiff", units="in", width=2, height=3, res=300)
@@ -875,11 +872,11 @@ CLD_Bacterial_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Bacterial_D
 ```
 
 
+
 #Random forest classifiers of plant genpotype (using the seed microbiome)
 #Load packages 
-
-#consider fruit color
-```{r,echo=FALSE,warning=FALSE}
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 # Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
 library(doParallel);packageVersion("doParallel")#‘1.0.17’
 library(foreach);packageVersion("foreach")#‘1.5.2’
@@ -893,26 +890,81 @@ library(doBy);packageVersion("doBy")#‘4.7.1.1’
 library(plotrix);packageVersion("plotrix")#‘3.8.4’
 library(ggpubr);packageVersion("ggpubr")#‘0.6.0’
 
+Bacteria_otu <- read.table("Bacteria_Table-rf.txt", header=TRUE,row.names="OTUID");Bacteria_otu
+Bacteria_otu <- otu_table(Bacteria_otu, taxa_are_rows = TRUE);Bacteria_otu 
+
+## Imported taxonomy
+#Bacteria_tax <- read.csv("Taxonomy.csv",header=TRUE,row.names="OTUID");Bacteria_tax
+Bacteria_tax <- read.table("Bacteria_Taxonomy-rf.txt", header=TRUE, sep="\t",row.names="OTUID");Bacteria_tax
+Bacteria_tax <- as.matrix(Bacteria_tax);Bacteria_tax
+Bacteria_tax <- tax_table(Bacteria_tax);Bacteria_tax
+
+## Imported metadata file
+#metadata <- read.table("Metadata.txt", header=TRUE, sep="\t",row.names="SampleID");metadata
+Bacteria_metadata<- read.csv("Bacteria_metadata.csv",header=TRUE,row.names="SampleID");Bacteria_metadata
+
+#rownames(Bacteria_metadata) <- Bacteria_metadata[,1]
+Bacteria_metadata <- sample_data(Bacteria_metadata);Bacteria_metadata
+#tree
+#tree <- read.tree(file = "tree.nwk");tree
+#tree <- phy_tree(tree)
+
+all(rownames(Bacteria_metadata) %in% colnames(Bacteria_otu))
+#Convert to phyloseq object
+Bacteria <- merge_phyloseq(Bacteria_otu,Bacteria_tax, Bacteria_metadata);Bacteria#[ 16460 taxa and 1197 samples ]
+Bacteria = subset_taxa(Bacteria, Kingdom=="Bacteria");Bacteria# [ 6448 taxa and 84 samples ]
+Bacteria = subset_taxa(Bacteria, Phylum!="CyanoBacteria");Bacteria#  [ 15588 taxa and 1197 samples ]
+Bacteria = subset_taxa(Bacteria, Order!="Chloroplast");Bacteria#  [ 15588 taxa and 1197 samples ]
+Bacteria = subset_taxa(Bacteria, Family!="Mitochondria");Bacteria# [ 15588 taxa and 1197 samples ]
+Bacteria <- prune_taxa(taxa_sums(Bacteria)>0, Bacteria);Bacteria# [ 15588 taxa and 1197 samples ]
+#OTU_table_Bacteria = as(otu_table(Bacteria), "matrix")
+#########################################################################################################
+#Summarize 
+microbiome::summarize_phyloseq(Bacteria)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+#Total number of reads = 27285519"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+sums_Bacteria <- sample_sums(Bacteria);sums_Bacteria
+sums_Bacteria <- data.frame(sums_Bacteria);sums_Bacteria
+sums_Bacteria <- as.matrix(sums_Bacteria);sums_Bacteria
+colSums(sums_Bacteria) #  27281011      
+max(sums_Bacteria) #225892
+min(sums_Bacteria) # 68
+sums_Bacteria
+#https://david-barnett.github.io/microViz/articles/web-only/tax-fixing.html #fixing the table
+#https://rpubs.com/bioguo/680490 (Random forest classifications)
+library(devtools);packageVersion("devtools")# ‘2.4.5’# Load the devtools package
+#install_github("guokai8/microbial") # Install the package (Microbial package)
+library(microbial);packageVersion("microbial")#‘0.0.22’####
+ps_RandomForest_bacteria=Bacteria
+save(ps_RandomForest_bacteria,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_bacteria.RData")
+
+
+
 #Bacterial claasifier
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Bacteria.RData")
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_bacteria.RData")
 
 prunescale = 0.05
 
 # Prune out rare OTUs by mean relative abundance set by prunescale
-tax.mean.ps1_Bacteria <- taxa_sums(ps1_Bacteria)/nsamples(ps1_Bacteria) # average number of reads for each otu
-sites.prune.ps1_Bacteria <- prune_taxa(tax.mean.ps1_Bacteria > prunescale, ps1_Bacteria)
+tax.mean.ps_RandomForest_bacteria <- taxa_sums(ps_RandomForest_bacteria)/nsamples(ps_RandomForest_bacteria) # average number of reads for each otu
+sites.prune.ps_RandomForest_bacteria <- prune_taxa(tax.mean.ps_RandomForest_bacteria > prunescale, ps_RandomForest_bacteria)
 
 #Next, we are going to format a dataframe of predictors (OTUs) and responses (States)
 # Make a dataframe of training data with OTUs as column and samples as rows
-predictors.ps1_Bacteria<- t(otu_table(sites.prune.ps1_Bacteria));predictors.ps1_Bacteria
-dim(predictors.ps1_Bacteria)
+predictors.ps_RandomForest_bacteria<- t(otu_table(sites.prune.ps_RandomForest_bacteria));predictors.ps_RandomForest_bacteria
+dim(predictors.ps_RandomForest_bacteria)
 # 1197 1655
 
 # Make one column for our outcome/response variable 
-response.ps1_Bacteria <- as.factor(sample_data(sites.prune.ps1_Bacteria)$Genotype);response.ps1_Bacteria
+response.ps_RandomForest_bacteria <- as.factor(sample_data(sites.prune.ps_RandomForest_bacteria)$Genotype);response.ps_RandomForest_bacteria
 # Combine them into 1 data frame
-rf.data.ps1_Bacteria <- data.frame(response.ps1_Bacteria, predictors.ps1_Bacteria);rf.data.ps1_Bacteria
-str(rf.data.ps1_Bacteria)
+rf.data.ps_RandomForest_bacteria <- data.frame(response.ps_RandomForest_bacteria, predictors.ps_RandomForest_bacteria);rf.data.ps_RandomForest_bacteria
+str(rf.data.ps_RandomForest_bacteria)
 # Set a random seed
 set.seed(5000)
 # My computer has 8 processor cores - adjust parameter of the following command as needed/desired
@@ -924,11 +976,11 @@ registerDoParallel(3)
 boot.imp.s <- data.frame(predictors=NULL, Try=NULL, MeanDecreaseGini=NULL)
 boot.imp.s <- foreach (Try=1:100, .combine=rbind) %dopar% {
   
-  ps1_Bacteria.classify <- randomForest(response.ps1_Bacteria ~., data = rf.data.ps1_Bacteria, ntree = 500, proximity=T, mtry=200)
-  print(ps1_Bacteria.classify)
+  ps_RandomForest_bacteria.classify <- randomForest(response.ps_RandomForest_bacteria ~., data = rf.data.ps_RandomForest_bacteria, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_bacteria.classify)
   
   # Make a data frame with predictor names and their importance
-  imp.s <- importance(ps1_Bacteria.classify)
+  imp.s <- importance(ps_RandomForest_bacteria.classify)
   imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
   
   cbind(imp.s, data.frame(Try=Try)) #)
@@ -941,14 +993,14 @@ boot.imp.s <- foreach (Try=1:100, .combine=rbind) %dopar% {
 boot.oob <- NULL
 boot.oob <- foreach (Try=1:100, .combine=rbind) %dopar% {
   
-  ps1_Bacteria.classify <- randomForest(response.ps1_Bacteria ~., data = rf.data.ps1_Bacteria, ntree = 500, proximity=T, mtry=200)
-  print(ps1_Bacteria.classify)
+  ps_RandomForest_bacteria.classify <- randomForest(response.ps_RandomForest_bacteria ~., data = rf.data.ps_RandomForest_bacteria, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_bacteria.classify)
   
   # Make a data frame with predictor names and their importance
-  imp.s <- importance(ps1_Bacteria.classify)
+  imp.s <- importance(ps_RandomForest_bacteria.classify)
   imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
   
-  c(boot.oob, ps1_Bacteria.classify$err.rate[500,1])
+  c(boot.oob, ps_RandomForest_bacteria.classify$err.rate[500,1])
 }
 
 #Display and visualize results
@@ -966,17 +1018,17 @@ str(summary.boot.s)
 imp.s.sort <- arrange(summary.boot.s, desc(MeanDecreaseGini.mean));imp.s.sort
 imp.s.sort$predictors <- factor(imp.s.sort$predictors, levels = imp.s.sort$predictors)
 # Select the top 50 predictors
-imp.s.5 <- imp.s.sort[1:5, ];imp.s.5
+imp.s.5 <- imp.s.sort[1:20, ];imp.s.5
 
 # What are those OTUs?
 # otunames.s = otunames of predictors
 # r.s = A logical containing which rows from phyloseq object were recovered as top 40 predictors
 otunames.s <- imp.s.5$predictors;otunames.s
-r.s <- rownames(tax_table(ps1_Bacteria)) %in% otunames.s;r.s
+r.s <- rownames(tax_table(ps_RandomForest_bacteria)) %in% otunames.s;r.s
 
 # Use r.s to pull out the taxonomic information for those OTUS in otunames.s
-t.table <- as.data.frame(tax_table(ps1_Bacteria)[r.s, ])
-write.csv(t.table, "RF.ps1_Bacteria.t.table.csv", quote=F,row.names=T)
+t.table <- as.data.frame(tax_table(ps_RandomForest_bacteria)[r.s, ])
+write.csv(t.table, "RF.ps_RandomForest_bacteria.t.table.csv", quote=F,row.names=T)
 
 
 #VISUALIZATION HERE
@@ -990,35 +1042,35 @@ axislabels[i]<-paste(names(axislabels)[i], t.table$Family[i])
 # Now we sum the abundance of each OTU by state so we can order the
 # RF predictor OTUs by which state they were most abundant in, followed
 # by their importance value. This makes the heatmap easier to interpret.
-sums<-summaryBy(. ~ response.ps1_Bacteria, data = rf.data.ps1_Bacteria[, c('response.ps1_Bacteria', as.character(otunames.s))], FUN = sum, keep.names = T);sums
+sums<-summaryBy(. ~ response.ps_RandomForest_bacteria, data = rf.data.ps_RandomForest_bacteria[, c('response.ps_RandomForest_bacteria', as.character(otunames.s))], FUN = sum, keep.names = T);sums
 state.organize <- sapply(as.character(otunames.s), FUN = function(x) which.max(sums[,x]));state.organize
-sums$response.ps1_Bacteria
-rf.data.ps1_Bacteria$response.ps1_Bacteria
+sums$response.ps_RandomForest_bacteria
+rf.data.ps_RandomForest_bacteria$response.ps_RandomForest_bacteria
 # hm is a dataframe of the abundance of the predictors, standardized and log transformed
-hm <- rf.data.ps1_Bacteria[,as.character(otunames.s)] %>% decostand(method='max', MARGIN=2) %>% decostand(method='log');hm
-hm$sample <- gsub('_',' ',sample_data(ps1_Bacteria)[rownames(hm),'Genotype']$Genotype)
+hm <- rf.data.ps_RandomForest_bacteria[,as.character(otunames.s)] %>% decostand(method='max', MARGIN=2) %>% decostand(method='log');hm
+hm$sample <- gsub('_',' ',sample_data(ps_RandomForest_bacteria)[rownames(hm),'Genotype']$Genotype)
 
-hm.melt <- melt(hm[c(order(state.organize), 6)]);hm.melt
+#hm.melt <- melt(hm[c(order(state.organize), 6)]);hm.melt
+hm.melt <-  as.data.table(hm[c(order(state.organize), 21)]);hm.melt
+hm.melt <- melt(hm.melt, id.vars = "sample")
 names(hm.melt) <- c("Tree","Taxon","StandardizedAbundance")
 
 # Turn predictors into a factor (re-ordered the same as the hm.melt object so they match up)
 imp.s.5$predictors <- factor(imp.s.5$predictors, levels(imp.s.5$predictors)[order(state.organize)])
 
 
-
 # Creat the heatmap with the taxon names and OTUs
 plot1_bacteria <- ggplot(hm.melt, aes(x=Tree, y=Taxon, fill=StandardizedAbundance)) + 
-  geom_tile() + scale_fill_gradient(low="white", high="black") + 
+  geom_tile() + scale_fill_gradient(low="white", high="gray33") + 
   theme(axis.text.x = element_text(angle=90, size=11), legend.position = "none", axis.text.y = element_text(hjust=0))  + 
   scale_y_discrete(labels=axislabels)+theme(axis.title.x = element_text(face="bold", colour="black", size=11),
                                             axis.title.y = element_text(face="bold", colour="black", size=11),
                                             axis.text.x = element_text(face="bold", colour="black", size=11),
                                             axis.text.y  = element_text(face="bold", colour="black", size=11))+ labs(tag = "",size=11);plot1_bacteria
-g1_bacteria <- ggplotGrob(plot1_bacteria);g1_bacteria
 
 #Creat the bargraph
 plot2_bacteria <- ggplot(imp.s.5, aes(x = predictors, y = MeanDecreaseGini.mean)) +
-  geom_bar(stat = "identity", fill = "steelblue4") +
+  geom_bar(stat = "identity", fill = "bisque4") +
   ylab("Bootstrap Mean \u00b1 SD Gini Index") +
   theme_bw() +
   geom_errorbar( aes(x=predictors, ymin=MeanDecreaseGini.mean-MeanDecreaseGini.sd, ymax=MeanDecreaseGini.mean+MeanDecreaseGini.sd), width=0.75, alpha=0.9, size=0.5) +
@@ -1027,21 +1079,17 @@ plot2_bacteria <- ggplot(imp.s.5, aes(x = predictors, y = MeanDecreaseGini.mean)
                        axis.text.x = element_text(face="bold", colour="black", size=11),
                        axis.text.y  = element_text(face="bold", colour="black", size=11))+ labs(tag = "",size=11);plot2_bacteria
 g2_bacteria <- ggplotGrob(plot2_bacteria);g2_bacteria
+
 library(ggpubr)
 library(patchwork)
+
 #Put them together
-RF1_bacteria=ggarrange(g1_bacteria, g2_bacteria, align='h', nrow=1, ncol=2, widths=c(4,2));RF1_bacteria
-tiff("RF1_bacteria.tiff", units="in", width=19, height=3, res=300)
-RF1_bacteria.tiff=RF1_bacteria+plot_layout(nrow=1);RF1_bacteria.tiff
+
+tiff("RF1_bacteria.tiff", units="in", width=15, height=6, res=300)
+RF1_bacteria.tiff=plot1_bacteria+plot2_bacteria+plot_layout(nrow=1);RF1_bacteria.tiff
 ggsave("RF1_bacteria.tiff", plot = RF1_bacteria.tiff)
 dev.off()
 ```
-
-
-
-
-
-
 
 
 ************************************************************************************************
@@ -1380,7 +1428,6 @@ ggsave(
 
 
 
-
 ##plot rarefaction curves  for the Fungi community
 #code based on https://microsud.github.io/microbiomeutilities/articles/microbiomeutilities.html
 ```{r, echo=FALSE,warning = FALSE}
@@ -1459,7 +1506,7 @@ gg2=ggplot(psmelt(ps.toptax_Fungi), aes(x=reorder(Sample, Genotype), y=Abundance
   #scale_fill_manual(values=c("#25725d", "#439b5b", "#7bc369", "#abd69a", "#d8e8b0", "#cccda7", "#bfb77b", "#7e9998", "#92B2B2", "#83bbbf", "#61acc1", "#58a0c4", "#7087c3","#8973b4", "#512972"))+
   scale_fill_manual(values = mycola)+
   xlab("") + ylab("Relative abundance (%)") +
-  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 3) + 
+  facet_wrap(~reorder(Genotype, Sample), scales = "free_x", nrow = 1) + 
   ggtitle("Order, top 500 ASVs") +
   theme_pubclean() + theme(legend.position="bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=0)) +
 theme(legend.text = element_text(face = c(rep("italic", 5), rep("plain", 5))))+
@@ -1612,8 +1659,7 @@ plot_Fungi_rich=ggboxplot(Fungi_richness, x = "Genotype", y = "Observed",fill  =
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungi_rich
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Fungi_rich
 
 
 tiff("Fungi_rich.tiff", units="in", width=2, height=3, res=300)
@@ -1633,8 +1679,7 @@ plot_Fungi_Shannon=ggboxplot(Fungi_richness, x = "Genotype", y = "Shannon",fill 
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungi_Shannon
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Fungi_Shannon
 
 
 tiff("Fungi_Shannon.tiff", units="in", width=2, height=3, res=300)
@@ -1730,8 +1775,7 @@ plot_Fungil_Abundance=ggboxplot(Fungil_Abundance, x = "Genotype", y = "log10",fi
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Fungil_Abundance
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Fungil_Abundance
 
 
 tiff("Fungil_abundance.tiff", units="in", width=2, height=3, res=300)
@@ -1762,6 +1806,227 @@ Fungil_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");F
 library(rcompanion)
 CLD_Fungil_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_log10_genotype$res);CLD_Fungil_Dunn_log10_genotype 
 
+```
+
+
+
+
+
+#Random forest classifiers of plant genpotype (using the seed microbiome)
+#Load packages 
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+# Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
+library(doParallel);packageVersion("doParallel")#‘1.0.17’
+library(foreach);packageVersion("foreach")#‘1.5.2’
+library(tidyverse);packageVersion("tidyverse")#‘2.0.0’
+library(ggplot2);packageVersion("ggplot2")#‘3.5.0’
+library(vegan);packageVersion("vegan")#‘2.6.4’
+library(reshape2);packageVersion("reshape2")#‘1.4.4’
+library(phyloseq);packageVersion("phyloseq")#‘1.46.0’
+library(randomForest);packageVersion("randomForest")
+library(doBy);packageVersion("doBy")#‘4.7.1.1’
+library(plotrix);packageVersion("plotrix")#‘3.8.4’
+library(ggpubr);packageVersion("ggpubr")#‘0.6.0’
+
+Fungi_otu <- read.table("Fungi_Table-rf.txt", header=TRUE,row.names="OTUID");Fungi_otu
+Fungi_otu <- otu_table(Fungi_otu, taxa_are_rows = TRUE);Fungi_otu 
+
+## Imported taxonomy
+#Fungi_tax <- read.csv("Taxonomy.csv",header=TRUE,row.names="OTUID");Fungi_tax
+Fungi_tax <- read.table("Fungi_Taxonomy-rf.txt", header=TRUE, sep="\t",row.names="OTUID");Fungi_tax
+Fungi_tax <- as.matrix(Fungi_tax);Fungi_tax
+Fungi_tax <- tax_table(Fungi_tax);Fungi_tax
+
+## Imported metadata file
+#metadata <- read.table("Metadata.txt", header=TRUE, sep="\t",row.names="SampleID");metadata
+Fungi_metadata<- read.csv("Fungi_metadata.csv",header=TRUE,row.names="SampleID");Fungi_metadata
+
+#rownames(Fungi_metadata) <- Fungi_metadata[,1]
+Fungi_metadata <- sample_data(Fungi_metadata);Fungi_metadata
+#tree
+#tree <- read.tree(file = "tree.nwk");tree
+#tree <- phy_tree(tree)
+
+all(rownames(Fungi_metadata) %in% colnames(Fungi_otu))
+#Convert to phyloseq object
+Fungi <- merge_phyloseq(Fungi_otu,Fungi_tax, Fungi_metadata);Fungi#[ 16460 taxa and 1197 samples ]
+Fungi = subset_taxa(Fungi, Kingdom=="Fungi");Fungi# [ 6448 taxa and 84 samples ]
+Fungi = subset_taxa(Fungi, Phylum!="CyanoFungi");Fungi#  [ 15588 taxa and 1197 samples ]
+Fungi = subset_taxa(Fungi, Order!="Chloroplast");Fungi#  [ 15588 taxa and 1197 samples ]
+Fungi = subset_taxa(Fungi, Family!="Mitochondria");Fungi# [ 15588 taxa and 1197 samples ]
+Fungi <- prune_taxa(taxa_sums(Fungi)>0, Fungi);Fungi# [ 15588 taxa and 1197 samples ]
+#OTU_table_Fungi = as(otu_table(Fungi), "matrix")
+#########################################################################################################
+#Summarize 
+microbiome::summarize_phyloseq(Fungi)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+#Total number of reads = 27285519"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+sums_Fungi <- sample_sums(Fungi);sums_Fungi
+sums_Fungi <- data.frame(sums_Fungi);sums_Fungi
+sums_Fungi <- as.matrix(sums_Fungi);sums_Fungi
+colSums(sums_Fungi) #  27281011      
+max(sums_Fungi) #225892
+min(sums_Fungi) # 68
+sums_Fungi
+#https://david-barnett.github.io/microViz/articles/web-only/tax-fixing.html #fixing the table
+#https://rpubs.com/bioguo/680490 (Random forest classifications)
+library(devtools);packageVersion("devtools")# ‘2.4.5’# Load the devtools package
+#install_github("guokai8/microbial") # Install the package (Microbial package)
+library(microbial);packageVersion("microbial")#‘0.0.22’####
+ps_RandomForest_Fungi=Fungi
+save(ps_RandomForest_Fungi,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_Fungi.RData")
+
+
+#Fungil claasifier
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_Fungi.RData")
+
+prunescale = 0.05
+
+# Prune out rare OTUs by mean relative abundance set by prunescale
+tax.mean.ps_RandomForest_Fungi <- taxa_sums(ps_RandomForest_Fungi)/nsamples(ps_RandomForest_Fungi) # average number of reads for each otu
+sites.prune.ps_RandomForest_Fungi <- prune_taxa(tax.mean.ps_RandomForest_Fungi > prunescale, ps_RandomForest_Fungi)
+
+#Next, we are going to format a dataframe of predictors (OTUs) and responses (States)
+# Make a dataframe of training data with OTUs as column and samples as rows
+predictors.ps_RandomForest_Fungi<- t(otu_table(sites.prune.ps_RandomForest_Fungi));predictors.ps_RandomForest_Fungi
+dim(predictors.ps_RandomForest_Fungi)
+# 1197 1655
+
+# Make one column for our outcome/response variable 
+response.ps_RandomForest_Fungi <- as.factor(sample_data(sites.prune.ps_RandomForest_Fungi)$Genotype);response.ps_RandomForest_Fungi
+# Combine them into 1 data frame
+rf.data.ps_RandomForest_Fungi <- data.frame(response.ps_RandomForest_Fungi, predictors.ps_RandomForest_Fungi);rf.data.ps_RandomForest_Fungi
+str(rf.data.ps_RandomForest_Fungi)
+# Set a random seed
+set.seed(5000)
+# My computer has 8 processor cores - adjust parameter of the following command as needed/desired
+registerDoParallel(3)
+
+# %dopar% implemented with foreach implements each loop call as an independent function call
+# and then parallelizes all the function calls across the number of processers set above with
+# registerDoParallel(). First, we need to set up a dataframe to store each bootstrap RF result.
+boot.imp.s <- data.frame(predictors=NULL, Try=NULL, MeanDecreaseGini=NULL)
+boot.imp.s <- foreach (Try=1:100, .combine=rbind) %dopar% {
+  
+  ps_RandomForest_Fungi.classify <- randomForest(response.ps_RandomForest_Fungi ~., data = rf.data.ps_RandomForest_Fungi, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_Fungi.classify)
+  
+  # Make a data frame with predictor names and their importance
+  imp.s <- importance(ps_RandomForest_Fungi.classify)
+  imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
+  
+  cbind(imp.s, data.frame(Try=Try)) #)
+  
+}
+
+# Same (and independent) as above but this time we are storing results from the
+# out-of-bag error rates, so we car report the correct-incorrect classification
+# rate for each group, and what types of misclassifications were made.
+boot.oob <- NULL
+boot.oob <- foreach (Try=1:100, .combine=rbind) %dopar% {
+  
+  ps_RandomForest_Fungi.classify <- randomForest(response.ps_RandomForest_Fungi ~., data = rf.data.ps_RandomForest_Fungi, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_Fungi.classify)
+  
+  # Make a data frame with predictor names and their importance
+  imp.s <- importance(ps_RandomForest_Fungi.classify)
+  imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
+  
+  c(boot.oob, ps_RandomForest_Fungi.classify$err.rate[500,1])
+}
+
+#Display and visualize results
+# Look at the results
+mean(boot.oob)#0.1007352
+sd(boot.oob)#0.003860804
+range(boot.oob)# 0.09106099 0.11027569
+# Create a dataframe with summary statistics from our bootstrap runs
+summary.boot.s <- summaryBy(MeanDecreaseGini ~ predictors, data= boot.imp.s, FUN = c(mean, sd, std.error));summary.boot.s
+write.csv(summary.boot.s,"summary.boot.s.csv")
+# Look at it
+head(summary.boot.s)
+str(summary.boot.s)
+# Order the predictor levels by importance
+imp.s.sort <- arrange(summary.boot.s, desc(MeanDecreaseGini.mean));imp.s.sort
+imp.s.sort$predictors <- factor(imp.s.sort$predictors, levels = imp.s.sort$predictors)
+# Select the top 50 predictors
+imp.s.5 <- imp.s.sort[1:20, ];imp.s.5
+
+# What are those OTUs?
+# otunames.s = otunames of predictors
+# r.s = A logical containing which rows from phyloseq object were recovered as top 40 predictors
+otunames.s <- imp.s.5$predictors;otunames.s
+r.s <- rownames(tax_table(ps_RandomForest_Fungi)) %in% otunames.s;r.s
+
+# Use r.s to pull out the taxonomic information for those OTUS in otunames.s
+t.table <- as.data.frame(tax_table(ps_RandomForest_Fungi)[r.s, ])
+write.csv(t.table, "RF.ps_RandomForest_Fungi.t.table.csv", quote=F,row.names=T)
+
+
+#VISUALIZATION HERE
+# Reformat the taxonomic names and paste them to OTU names for axis labels
+# (highest determined taxonomic rate, get rid of special characters, etc.)
+axislabels <- with(t.table, paste(rownames(t.table), gsub("[sgfocp]__","",Genus,perl=T) %>% gsub("_"," ",.,perl=T) %>% gsub("[\\s]?(unclassified|ge)[\\s]?","",.,perl=T)))
+names(axislabels) <- rownames(t.table)
+i <- grep("(uncultured)|([01234567890-]$)+", axislabels, perl=T)
+axislabels[i]<-paste(names(axislabels)[i], t.table$Family[i])
+
+# Now we sum the abundance of each OTU by state so we can order the
+# RF predictor OTUs by which state they were most abundant in, followed
+# by their importance value. This makes the heatmap easier to interpret.
+sums<-summaryBy(. ~ response.ps_RandomForest_Fungi, data = rf.data.ps_RandomForest_Fungi[, c('response.ps_RandomForest_Fungi', as.character(otunames.s))], FUN = sum, keep.names = T);sums
+state.organize <- sapply(as.character(otunames.s), FUN = function(x) which.max(sums[,x]));state.organize
+sums$response.ps_RandomForest_Fungi
+rf.data.ps_RandomForest_Fungi$response.ps_RandomForest_Fungi
+# hm is a dataframe of the abundance of the predictors, standardized and log transformed
+hm <- rf.data.ps_RandomForest_Fungi[,as.character(otunames.s)] %>% decostand(method='max', MARGIN=2) %>% decostand(method='log');hm
+hm$sample <- gsub('_',' ',sample_data(ps_RandomForest_Fungi)[rownames(hm),'Genotype']$Genotype)
+
+#hm.melt <- melt(hm[c(order(state.organize), 6)]);hm.melt
+hm.melt <-  as.data.table(hm[c(order(state.organize), 21)]);hm.melt
+hm.melt <- melt(hm.melt, id.vars = "sample")
+names(hm.melt) <- c("Tree","Taxon","StandardizedAbundance")
+
+# Turn predictors into a factor (re-ordered the same as the hm.melt object so they match up)
+imp.s.5$predictors <- factor(imp.s.5$predictors, levels(imp.s.5$predictors)[order(state.organize)])
+
+
+# Creat the heatmap with the taxon names and OTUs
+plot1_Fungi <- ggplot(hm.melt, aes(x=Tree, y=Taxon, fill=StandardizedAbundance)) + 
+  geom_tile() + scale_fill_gradient(low="white", high="#CC79A7") + 
+  theme(axis.text.x = element_text(angle=90, size=14), legend.position = "none", axis.text.y = element_text(hjust=0))  + 
+  scale_y_discrete(labels=axislabels)+theme(axis.title.x = element_text(face="bold", colour="black", size=14),
+                                            axis.title.y = element_text(face="bold", colour="black", size=14),
+                                            axis.text.x = element_text(face="bold", colour="black", size=14),
+                                            axis.text.y  = element_text(face="bold", colour="black", size=14))+ labs(tag = "",size=14);plot1_Fungi
+
+#Creat the bargraph
+plot2_Fungi <- ggplot(imp.s.5, aes(x = predictors, y = MeanDecreaseGini.mean)) +
+  geom_bar(stat = "identity", fill = "grey35") +
+  ylab("Bootstrap Mean \u00b1 SD Gini Index") +
+  theme_bw() +
+  geom_errorbar( aes(x=predictors, ymin=MeanDecreaseGini.mean-MeanDecreaseGini.sd, ymax=MeanDecreaseGini.mean+MeanDecreaseGini.sd), width=0.75, alpha=0.9, size=0.5) +
+  coord_flip() + theme(axis.title.x = element_text(face="bold", colour="black", size=14),
+                       axis.title.y = element_text(face="bold", colour="black", size=14),
+                       axis.text.x = element_text(face="bold", colour="black", size=14),
+                       axis.text.y  = element_text(face="bold", colour="black", size=14))+ labs(tag = "",size=14);plot2_Fungi
+g2_Fungi <- ggplotGrob(plot2_Fungi);g2_Fungi
+
+library(ggpubr)
+library(patchwork)
+
+#Put them together
+
+tiff("RF1_Fungi.tiff", units="in", width=15, height=6, res=300)
+RF1_Fungi.tiff=plot1_Fungi+plot2_Fungi+plot_layout(nrow=1);RF1_Fungi.tiff
+ggsave("RF1_Fungi.tiff", plot = RF1_Fungi.tiff)
+dev.off()
 ```
 
 
@@ -1816,6 +2081,7 @@ save(ps0_Archaea,
 file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Archaea.RData")
 
 ```
+
 
 #clean the data
 ```{r,echo = FALSE,warning = FALSE}
@@ -1975,6 +2241,7 @@ asv_prev_rel_taxo_gen_obs <- merge(asv_prev_rel_taxo,
                                    by = "ASV")
 ```
 
+
 ## Ab-Prev Plot 
 ```{r}
 counts <- asv_prev_rel_taxo_gen_obs %>% dplyr::count(Kingdom = "Archaea")
@@ -2037,6 +2304,64 @@ p_core_flex1_all_Archaea <-
 ```{r}
 save(ps3_Archaea, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
 ```
+
+
+
+#comsider order level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Archaea)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Archaea, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
+ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
+upset_Archaea_Order=upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Order");upset_Archaea_Order
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_Archaea_Order.tiff",     
+  plot = upset_Archaea_Order,
+  scale = 1,
+  width = 20,
+ height = 11,
+ units = c("cm"),
+  dpi = 600)
+```
+
+
+
+#consider the genus level
+#https://www.geeksforgeeks.org/networkd3-package-in-r/
+#https://adrientaudiere.github.io/MiscMetabar/articles/MiscMetabar.html
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+library("MiscMetabar")
+library("phyloseq")
+library("networkD3")
+#summary_plot_pq(ps3_Archaea)
+#sankey_pq(gp, taxa = c(1:5))
+#upset_pq(ps3_Archaea, "Genotype", taxa = "Genus")
+
+toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:25];toptax
+ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
+upset_Archaea_Genus=upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Genus");upset_Archaea_Genus
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_Archaea_Genus.tiff",     
+ plot = upset_Archaea_Genus,
+  scale = 1,
+  width = 18,
+ height = 11,
+ units = c("cm"),
+  dpi = 600)
+```
+
 
 
 
@@ -2314,8 +2639,7 @@ plot_Archaea_rich=ggboxplot(Archaea_richness, x = "Genotype", y = "Observed",fil
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_rich
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Archaea_rich
 
 
 tiff("Archaea_rich.tiff", units="in", width=2, height=3, res=300)
@@ -2335,8 +2659,7 @@ plot_Archaea_Shannon=ggboxplot(Archaea_richness, x = "Genotype", y = "Shannon",f
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_Shannon
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Archaea_Shannon
 
 
 tiff("Archaea_Shannon.tiff", units="in", width=2, height=3, res=300)
@@ -2429,8 +2752,7 @@ plot_Archaea_Abundance=ggboxplot(Archaea_Abundance, x = "Genotype", y = "log10",
         axis.title.y = element_text(face="bold", colour="gray33", size=12),
         axis.text.x = element_blank(),
         axis.text.y  = element_text( colour="gray33", size=12))+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "")+
-  theme(plot.margin = margin(0, 0, 0, 0, "pt"));plot_Archaea_Abundance
+  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");plot_Archaea_Abundance
 
 
 tiff("Archaea_abundance.tiff", units="in", width=2, height=3, res=300)
@@ -2463,9 +2785,228 @@ CLD_Archaea_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Archaea_Dunn_
 
 
 
+#Random forest classifiers of plant genpotype (using the seed microbiome)
+#Load packages 
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+# Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
+library(doParallel);packageVersion("doParallel")#‘1.0.17’
+library(foreach);packageVersion("foreach")#‘1.5.2’
+library(tidyverse);packageVersion("tidyverse")#‘2.0.0’
+library(ggplot2);packageVersion("ggplot2")#‘3.5.0’
+library(vegan);packageVersion("vegan")#‘2.6.4’
+library(reshape2);packageVersion("reshape2")#‘1.4.4’
+library(phyloseq);packageVersion("phyloseq")#‘1.46.0’
+library(randomForest);packageVersion("randomForest")
+library(doBy);packageVersion("doBy")#‘4.7.1.1’
+library(plotrix);packageVersion("plotrix")#‘3.8.4’
+library(ggpubr);packageVersion("ggpubr")#‘0.6.0’
+
+Archaea_otu <- read.table("Archaea_Table-rf.txt", header=TRUE,row.names="OTUID");Archaea_otu
+Archaea_otu <- otu_table(Archaea_otu, taxa_are_rows = TRUE);Archaea_otu 
+
+## Imported taxonomy
+#Archaea_tax <- read.csv("Taxonomy.csv",header=TRUE,row.names="OTUID");Archaea_tax
+Archaea_tax <- read.table("Archaea_Taxonomy-rf.txt", header=TRUE, sep="\t",row.names="OTUID");Archaea_tax
+Archaea_tax <- as.matrix(Archaea_tax);Archaea_tax
+Archaea_tax <- tax_table(Archaea_tax);Archaea_tax
+
+## Imported metadata file
+#metadata <- read.table("Metadata.txt", header=TRUE, sep="\t",row.names="SampleID");metadata
+Archaea_metadata<- read.csv("Archaea_metadata.csv",header=TRUE,row.names="SampleID");Archaea_metadata
+
+#rownames(Archaea_metadata) <- Archaea_metadata[,1]
+Archaea_metadata <- sample_data(Archaea_metadata);Archaea_metadata
+#tree
+#tree <- read.tree(file = "tree.nwk");tree
+#tree <- phy_tree(tree)
+
+all(rownames(Archaea_metadata) %in% colnames(Archaea_otu))
+#Convert to phyloseq object
+Archaea <- merge_phyloseq(Archaea_otu,Archaea_tax, Archaea_metadata);Archaea#[ 16460 taxa and 1197 samples ]
+Archaea = subset_taxa(Archaea, Kingdom=="Archaea");Archaea# [ 6448 taxa and 84 samples ]
+Archaea = subset_taxa(Archaea, Phylum!="CyanoArchaea");Archaea#  [ 15588 taxa and 1197 samples ]
+Archaea = subset_taxa(Archaea, Order!="Chloroplast");Archaea#  [ 15588 taxa and 1197 samples ]
+Archaea = subset_taxa(Archaea, Family!="Mitochondria");Archaea# [ 15588 taxa and 1197 samples ]
+Archaea <- prune_taxa(taxa_sums(Archaea)>0, Archaea);Archaea# [ 15588 taxa and 1197 samples ]
+#OTU_table_Archaea = as(otu_table(Archaea), "matrix")
+#########################################################################################################
+#Summarize 
+microbiome::summarize_phyloseq(Archaea)
+#Number of singletons = 68"
+#Sparsity = 0.995179763625127"
+#Average number of reads = 22794.9197994987"
+#Total number of reads = 27285519"
+#Max. number of reads = 225892"
+#Min. number of reads = 68"
+sums_Archaea <- sample_sums(Archaea);sums_Archaea
+sums_Archaea <- data.frame(sums_Archaea);sums_Archaea
+sums_Archaea <- as.matrix(sums_Archaea);sums_Archaea
+colSums(sums_Archaea) #  27281011      
+max(sums_Archaea) #225892
+min(sums_Archaea) # 68
+sums_Archaea
+#https://david-barnett.github.io/microViz/articles/web-only/tax-fixing.html #fixing the table
+#https://rpubs.com/bioguo/680490 (Random forest classifications)
+library(devtools);packageVersion("devtools")# ‘2.4.5’# Load the devtools package
+#install_github("guokai8/microbial") # Install the package (Microbial package)
+library(microbial);packageVersion("microbial")#‘0.0.22’####
+ps_RandomForest_Archaea=Archaea
+save(ps_RandomForest_Archaea,
+file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_Archaea.RData")
 
 
-#Figures
+#Archaeal claasifier
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps_RandomForest_Archaea.RData")
+
+prunescale = 0.05
+
+# Prune out rare OTUs by mean relative abundance set by prunescale
+tax.mean.ps_RandomForest_Archaea <- taxa_sums(ps_RandomForest_Archaea)/nsamples(ps_RandomForest_Archaea) # average number of reads for each otu
+sites.prune.ps_RandomForest_Archaea <- prune_taxa(tax.mean.ps_RandomForest_Archaea > prunescale, ps_RandomForest_Archaea)
+
+#Next, we are going to format a dataframe of predictors (OTUs) and responses (States)
+# Make a dataframe of training data with OTUs as column and samples as rows
+predictors.ps_RandomForest_Archaea<- t(otu_table(sites.prune.ps_RandomForest_Archaea));predictors.ps_RandomForest_Archaea
+dim(predictors.ps_RandomForest_Archaea)
+# 1197 1655
+
+# Make one column for our outcome/response variable 
+response.ps_RandomForest_Archaea <- as.factor(sample_data(sites.prune.ps_RandomForest_Archaea)$Genotype);response.ps_RandomForest_Archaea
+# Combine them into 1 data frame
+rf.data.ps_RandomForest_Archaea <- data.frame(response.ps_RandomForest_Archaea, predictors.ps_RandomForest_Archaea);rf.data.ps_RandomForest_Archaea
+str(rf.data.ps_RandomForest_Archaea)
+# Set a random seed
+set.seed(5000)
+# My computer has 8 processor cores - adjust parameter of the following command as needed/desired
+registerDoParallel(3)
+
+# %dopar% implemented with foreach implements each loop call as an independent function call
+# and then parallelizes all the function calls across the number of processers set above with
+# registerDoParallel(). First, we need to set up a dataframe to store each bootstrap RF result.
+boot.imp.s <- data.frame(predictors=NULL, Try=NULL, MeanDecreaseGini=NULL)
+boot.imp.s <- foreach (Try=1:100, .combine=rbind) %dopar% {
+  
+  ps_RandomForest_Archaea.classify <- randomForest(response.ps_RandomForest_Archaea ~., data = rf.data.ps_RandomForest_Archaea, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_Archaea.classify)
+  
+  # Make a data frame with predictor names and their importance
+  imp.s <- importance(ps_RandomForest_Archaea.classify)
+  imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
+  
+  cbind(imp.s, data.frame(Try=Try)) #)
+  
+}
+
+# Same (and independent) as above but this time we are storing results from the
+# out-of-bag error rates, so we car report the correct-incorrect classification
+# rate for each group, and what types of misclassifications were made.
+boot.oob <- NULL
+boot.oob <- foreach (Try=1:100, .combine=rbind) %dopar% {
+  
+  ps_RandomForest_Archaea.classify <- randomForest(response.ps_RandomForest_Archaea ~., data = rf.data.ps_RandomForest_Archaea, ntree = 500, proximity=T, mtry=200)
+  print(ps_RandomForest_Archaea.classify)
+  
+  # Make a data frame with predictor names and their importance
+  imp.s <- importance(ps_RandomForest_Archaea.classify)
+  imp.s <- data.frame(predictors = rownames(imp.s), imp.s)
+  
+  c(boot.oob, ps_RandomForest_Archaea.classify$err.rate[500,1])
+}
+
+#Display and visualize results
+# Look at the results
+mean(boot.oob)#0.1007352
+sd(boot.oob)#0.003860804
+range(boot.oob)# 0.09106099 0.11027569
+# Create a dataframe with summary statistics from our bootstrap runs
+summary.boot.s <- summaryBy(MeanDecreaseGini ~ predictors, data= boot.imp.s, FUN = c(mean, sd, std.error));summary.boot.s
+write.csv(summary.boot.s,"summary.boot.s.csv")
+# Look at it
+head(summary.boot.s)
+str(summary.boot.s)
+# Order the predictor levels by importance
+imp.s.sort <- arrange(summary.boot.s, desc(MeanDecreaseGini.mean));imp.s.sort
+imp.s.sort$predictors <- factor(imp.s.sort$predictors, levels = imp.s.sort$predictors)
+# Select the top 50 predictors
+imp.s.5 <- imp.s.sort[1:20, ];imp.s.5
+
+# What are those OTUs?
+# otunames.s = otunames of predictors
+# r.s = A logical containing which rows from phyloseq object were recovered as top 40 predictors
+otunames.s <- imp.s.5$predictors;otunames.s
+r.s <- rownames(tax_table(ps_RandomForest_Archaea)) %in% otunames.s;r.s
+
+# Use r.s to pull out the taxonomic information for those OTUS in otunames.s
+t.table <- as.data.frame(tax_table(ps_RandomForest_Archaea)[r.s, ])
+write.csv(t.table, "RF.ps_RandomForest_Archaea.t.table.csv", quote=F,row.names=T)
+
+
+#VISUALIZATION HERE
+# Reformat the taxonomic names and paste them to OTU names for axis labels
+# (highest determined taxonomic rate, get rid of special characters, etc.)
+axislabels <- with(t.table, paste(rownames(t.table), gsub("[sgfocp]__","",Genus,perl=T) %>% gsub("_"," ",.,perl=T) %>% gsub("[\\s]?(unclassified|ge)[\\s]?","",.,perl=T)))
+names(axislabels) <- rownames(t.table)
+i <- grep("(uncultured)|([01234567890-]$)+", axislabels, perl=T)
+axislabels[i]<-paste(names(axislabels)[i], t.table$Family[i])
+
+# Now we sum the abundance of each OTU by state so we can order the
+# RF predictor OTUs by which state they were most abundant in, followed
+# by their importance value. This makes the heatmap easier to interpret.
+sums<-summaryBy(. ~ response.ps_RandomForest_Archaea, data = rf.data.ps_RandomForest_Archaea[, c('response.ps_RandomForest_Archaea', as.character(otunames.s))], FUN = sum, keep.names = T);sums
+state.organize <- sapply(as.character(otunames.s), FUN = function(x) which.max(sums[,x]));state.organize
+sums$response.ps_RandomForest_Archaea
+rf.data.ps_RandomForest_Archaea$response.ps_RandomForest_Archaea
+# hm is a dataframe of the abundance of the predictors, standardized and log transformed
+hm <- rf.data.ps_RandomForest_Archaea[,as.character(otunames.s)] %>% decostand(method='max', MARGIN=2) %>% decostand(method='log');hm
+hm$sample <- gsub('_',' ',sample_data(ps_RandomForest_Archaea)[rownames(hm),'Genotype']$Genotype)
+
+#hm.melt <- melt(hm[c(order(state.organize), 6)]);hm.melt
+hm.melt <-  as.data.table(hm[c(order(state.organize), 21)]);hm.melt
+hm.melt <- melt(hm.melt, id.vars = "sample")
+names(hm.melt) <- c("Tree","Taxon","StandardizedAbundance")
+
+# Turn predictors into a factor (re-ordered the same as the hm.melt object so they match up)
+imp.s.5$predictors <- factor(imp.s.5$predictors, levels(imp.s.5$predictors)[order(state.organize)])
+
+
+# Creat the heatmap with the taxon names and OTUs
+plot1_Archaea <- ggplot(hm.melt, aes(x=Tree, y=Taxon, fill=StandardizedAbundance)) + 
+  geom_tile() + scale_fill_gradient(low="white", high="grey35") + 
+  theme(axis.text.x = element_text(angle=90, size=14), legend.position = "none", axis.text.y = element_text(hjust=0))  + 
+  scale_y_discrete(labels=axislabels)+theme(axis.title.x = element_text(face="bold", colour="black", size=14),
+                                            axis.title.y = element_text(face="bold", colour="black", size=14),
+                                            axis.text.x = element_text(face="bold", colour="black", size=14),
+                                            axis.text.y  = element_text(face="bold", colour="black", size=14))+ labs(tag = "",size=14);plot1_Archaea
+
+#Creat the bargraph
+plot2_Archaea <- ggplot(imp.s.5, aes(x = predictors, y = MeanDecreaseGini.mean)) +
+  geom_bar(stat = "identity", fill = "#7E6148B2") +
+  ylab("Bootstrap Mean \u00b1 SD Gini Index") +
+  theme_bw() +
+  geom_errorbar( aes(x=predictors, ymin=MeanDecreaseGini.mean-MeanDecreaseGini.sd, ymax=MeanDecreaseGini.mean+MeanDecreaseGini.sd), width=0.75, alpha=0.9, size=0.5) +
+  coord_flip() + theme(axis.title.x = element_text(face="bold", colour="black", size=14),
+                       axis.title.y = element_text(face="bold", colour="black", size=14),
+                       axis.text.x = element_text(face="bold", colour="black", size=14),
+                       axis.text.y  = element_text(face="bold", colour="black", size=14))+ labs(tag = "",size=14);plot2_Archaea
+g2_Archaea <- ggplotGrob(plot2_Archaea);g2_Archaea
+
+library(ggpubr)
+library(patchwork)
+
+#Put them together
+
+tiff("RF1_Archaea.tiff", units="in", width=15, height=6, res=300)
+RF1_Archaea.tiff=plot1_Archaea+plot2_Archaea+plot_layout(nrow=1);RF1_Archaea.tiff
+ggsave("RF1_Archaea.tiff", plot = RF1_Archaea.tiff)
+dev.off()
+```
+
+
+
+
+
+Figures combined
 #Rarefaction
 ```{r}
 tiff("Rarefaction.tiff", units="in", width=9, height=3.5, res=300)
