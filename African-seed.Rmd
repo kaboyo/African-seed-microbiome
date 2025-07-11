@@ -204,6 +204,7 @@ ps_Bacteria <- merge_phyloseq(
   tax_tab_bac, 
   metadata_bac);ps_Bacteria#[ 16460 taxa & 1197 samples ]
 summarize_phyloseq(ps_Bacteria)
+
 ps0_Bacteria <- ps_Bacteria # 16460 taxa & 1197 samples
 save(ps0_Bacteria,
 file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps0_Bacteria.RData")
@@ -221,6 +222,15 @@ ps_clean_Bacteria = subset_taxa(ps_clean_Bacteria, Order!="Chloroplast");ps_clea
 ps_clean_Bacteria = subset_taxa(ps_clean_Bacteria, Family!="Mitochondria");ps_clean_Bacteria# [ 15588 taxa & 1197 samples ]
 ps_clean_Bacteria <- prune_taxa(taxa_sums(ps_clean_Bacteria)>0, ps_clean_Bacteria);ps_clean_Bacteria# [ 15588 taxa & 1197 samples ]
 
+taxonomy <- as.vector(phyloseq::tax_table(ps_clean_Bacteria))
+sums_ps_clean_Bacteria <- sample_sums(ps_clean_Bacteria);sums_ps_clean_Bacteria
+sums_ps_clean_Bacteria <- data.frame(sums_ps_clean_Bacteria);sums_ps_clean_Bacteria
+sums_ps_clean_Bacteria <- as.matrix(sums_ps_clean_Bacteria);sums_ps_clean_Bacteria
+colSums(sums_ps_clean_Bacteria) #  2684660      
+max(sums_ps_clean_Bacteria) #199701
+min(sums_ps_clean_Bacteria) # 1889
+sums_ps_clean_Bacteria
+
 ps1_Bacteria <- ps_clean_Bacteria
 
 sort(sample_sums(ps1_Bacteria))
@@ -231,12 +241,12 @@ sample_data(ps1_Bacteria)$total_reads <- sample_sums(ps1_Bacteria)
 
 save(ps1_Bacteria, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Bacteria.RData")
 
-K <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Kingdom"]));K
-P <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Phylum"]));P # 38 phyla
-C <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Class"]));C # 109 classes
-O <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Order"]));O # 261 orders
-Fa <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Family"]));Fa # 476 families
-G <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Genus"]));G # 1187 genera
+K <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Kingdom"]));K#
+P <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Phylum"]));P # 27 phyla
+C <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Class"]));C # 53 classes
+O <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Order"]));O # 137 orders
+Fa <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Family"]));Fa # 251 families
+G <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Genus"]));G # 503 genera
 #S <- as.data.frame(table(tax_table(ps1_Bacteria)[,"Species"]));S # 1264 species
 
 microbiome::summarize_phyloseq(ps1_Bacteria)
@@ -496,7 +506,7 @@ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/p
 library(microbiomeutilities)
 # set seed
 set.seed(1)
-subsamples <- seq(0, 50000, by=500)[-1]
+subsamples <- seq(0, 50000, by=10000)[-1]
 #subsamples = c(10, 5000, 10000, 20000, 30000)
 
 Rareaction_Bacteria <- plot_alpha_rcurve(ps3_Bacteria, index="observed",
@@ -872,6 +882,54 @@ CLD_Bacterial_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Bacterial_D
 ```
 
 
+#Differentially abundant bacterial taxa
+
+```{r}
+#https://rpubs.com/kjojess/1013527
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+#Install corncob using:
+#remotes::install_github("statdivlab/corncob")
+library(corncob)
+library(lefser)
+require(dplyr)
+require(tibble)
+library(qiime2R)
+library(circlize)
+library(ggplot2)
+library(microbiomeMarker)
+library(RColorBrewer)
+#library(ggthemr)
+library(plyr)
+library(phyloseq)
+library(tidyverse)
+library(ComplexHeatmap)
+library(cowplot)
+library(phyloseq)
+library(microbiomeMarker)
+#Load the data
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+set.seed(1)
+#sample_data(ps3_Bacteria)
+
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+lefse_cc_path_Genus <- run_lefse(
+    ps3_Bacteria,
+    wilcoxon_cutoff = 0.05,
+    group = "Genotype",
+    kw_cutoff = 0.05,
+    multigrp_strat = TRUE,
+    lda_cutoff =4,
+    taxa_rank="Genus"
+)
+lefse_cc_path_Genus
+sig_marker_lefse<-data.frame(marker_table(lefse_cc_path_Genus))
+
+plot_abundance(lefse_cc_path_Genus, group="Genotype")
+Lefse_bacteria=plot_ef_bar(lefse_cc_path_Genus);Lefse_bacteria
+
+```
+
 
 #Random forest classifiers of plant genpotype (using the seed microbiome)
 #Load packages 
@@ -1099,6 +1157,8 @@ dev.off()
 #Load data (ASV table, taxonomy & tree, & metadata_Fungi)
 ```{r,echo = F}
 ##Imported feature table
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
 asv_tab_Fungi <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Fungi_Table.txt", 
               header=TRUE,
               row.names="OTUID");asv_tab_Fungi
@@ -1167,11 +1227,11 @@ sample_data(ps1_Fungi)$total_reads <- sample_sums(ps1_Fungi)
 save(ps1_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Fungi.RData")
 
 K <- as.data.frame(table(tax_table(ps1_Fungi)[,"Kingdom"]));K
-P <- as.data.frame(table(tax_table(ps1_Fungi)[,"Phylum"]));P # 38 phyla
-C <- as.data.frame(table(tax_table(ps1_Fungi)[,"Class"]));C # 109 classes
-O <- as.data.frame(table(tax_table(ps1_Fungi)[,"Order"]));O # 261 orders
-Fa <- as.data.frame(table(tax_table(ps1_Fungi)[,"Family"]));Fa # 476 families
-G <- as.data.frame(table(tax_table(ps1_Fungi)[,"Genus"]));G # 1187 genera
+P <- as.data.frame(table(tax_table(ps1_Fungi)[,"Phylum"]));P # 9 phyla
+C <- as.data.frame(table(tax_table(ps1_Fungi)[,"Class"]));C # 18 classes
+O <- as.data.frame(table(tax_table(ps1_Fungi)[,"Order"]));O # 42 orders
+Fa <- as.data.frame(table(tax_table(ps1_Fungi)[,"Family"]));Fa # 70 families
+G <- as.data.frame(table(tax_table(ps1_Fungi)[,"Genus"]));G # 104 genera
 #S <- as.data.frame(table(tax_table(ps1_Fungi)[,"Species"]));S # 1264 species
 
 microbiome::summarize_phyloseq(ps1_Fungi)
@@ -1435,7 +1495,7 @@ load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/p
 library(microbiomeutilities)
 # set seed
 set.seed(1)
-subsamples <- seq(0, 50000, by=500)[-1]
+subsamples <- seq(0, 50000, by=5500)[-1]
 #subsamples = c(10, 5000, 10000, 20000, 30000)
 
 Rareaction_Fungi <- plot_alpha_rcurve(ps3_Fungi, index="observed",
@@ -1812,6 +1872,67 @@ CLD_Fungil_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Fungil_Dunn_lo
 
 
 
+#Differentially abundant Fungal taxa
+
+```{r}
+#https://rpubs.com/kjojess/1013527
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+#Install corncob using:
+#remotes::install_github("statdivlab/corncob")
+library(corncob)
+library(lefser)
+require(dplyr)
+require(tibble)
+library(qiime2R)
+library(circlize)
+library(ggplot2)
+library(microbiomeMarker)
+library(RColorBrewer)
+#library(ggthemr)
+library(plyr)
+library(phyloseq)
+library(tidyverse)
+library(ComplexHeatmap)
+library(cowplot)
+library(phyloseq)
+library(microbiomeMarker)
+#Load the data
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+set.seed(1)
+#sample_data(ps3_Fungi)
+
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+lefse_cc_path_Genus_fungi <- run_lefse(
+    ps3_Fungi,
+    wilcoxon_cutoff = 0.05,
+    group = "Genotype",
+    kw_cutoff = 0.05,
+    multigrp_strat = TRUE,
+    lda_cutoff =4,
+    taxa_rank="Genus"
+)
+lefse_cc_path_Genus_fungi
+sig_marker_lefse<-data.frame(marker_table(lefse_cc_path_Genus_fungi))
+
+plot_abundance(lefse_cc_path_Genus_fungi, group="Genotype")
+Lefse_fungi=plot_ef_bar(lefse_cc_path_Genus_fungi);Lefse_fungi
+
+```
+
+#Assemble the differentially abundant taxa
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+library(ggpubr)
+tiff("Differential_abundance.tiff", units="in", width=8, height=6, res=300)
+Differential_abundance.tiff= Lefse_bacteria+Lefse_fungi+plot_layout(nrow= 2);Differential_abundance.tiff
+ggsave("Differential_abundance.tiff", plot = Differential_abundance.tiff)
+dev.off()
+
+```
+
+
 #Random forest classifiers of plant genpotype (using the seed microbiome)
 #Load packages 
 ```{r}
@@ -2033,9 +2154,13 @@ dev.off()
 #Archaeal community
 
 
+
+
 #Load data (ASV table, taxonomy & tree, & metadata_Archaea)
 ```{r,echo = F}
 ##Imported feature table
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
 asv_tab_Archaea <- read.table("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Archaea_Table.txt", 
               header=TRUE,
               row.names="OTUID",sep="\t");asv_tab_Archaea
@@ -2103,12 +2228,12 @@ sample_data(ps1_Archaea)$total_reads <- sample_sums(ps1_Archaea)
 
 save(ps1_Archaea, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps1_Archaea.RData")
 
-K <- as.data.frame(table(tax_table(ps1_Archaea)[,"Kingdom"]));K
-P <- as.data.frame(table(tax_table(ps1_Archaea)[,"Phylum"]));P # 38 phyla
-C <- as.data.frame(table(tax_table(ps1_Archaea)[,"Class"]));C # 109 classes
-O <- as.data.frame(table(tax_table(ps1_Archaea)[,"Order"]));O # 261 orders
-Fa <- as.data.frame(table(tax_table(ps1_Archaea)[,"Family"]));Fa # 476 families
-G <- as.data.frame(table(tax_table(ps1_Archaea)[,"Genus"]));G # 1187 genera
+K <- as.data.frame(table(tax_table(ps1_Archaea)[,"Kingdom"]));K#56
+P <- as.data.frame(table(tax_table(ps1_Archaea)[,"Phylum"]));P # 4 phyla
+C <- as.data.frame(table(tax_table(ps1_Archaea)[,"Class"]));C # 5 classes
+O <- as.data.frame(table(tax_table(ps1_Archaea)[,"Order"]));O # 5 orders
+Fa <- as.data.frame(table(tax_table(ps1_Archaea)[,"Family"]));Fa # 7 families
+G <- as.data.frame(table(tax_table(ps1_Archaea)[,"Genus"]));G # 20 genera
 #S <- as.data.frame(table(tax_table(ps1_Archaea)[,"Species"]));S # 1264 species
 
 microbiome::summarize_phyloseq(ps1_Archaea)
@@ -2406,7 +2531,7 @@ ggsave("p_Archaea.tiff", plot = Rareaction_Archaea)
 
 ```{r,echo=FALSE,warning = FALSE}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
-
+ps3_Archaea
 # Bar plots:
 ##Showing individual replicates. Top 500 taxa
 toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
@@ -2785,6 +2910,58 @@ CLD_Archaea_Dunn_log10_genotype = cldList(P.adj ~ Comparison, data=Archaea_Dunn_
 
 
 
+
+
+#Differentially abundant archaeal taxa
+
+```{r}
+#https://rpubs.com/kjojess/1013527
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+rm(list = ls())
+#Install corncob using:
+#remotes::install_github("statdivlab/corncob")
+library(corncob)
+library(lefser)
+require(dplyr)
+require(tibble)
+library(qiime2R)
+library(circlize)
+library(ggplot2)
+library(microbiomeMarker)
+library(RColorBrewer)
+#library(ggthemr)
+library(plyr)
+library(phyloseq)
+library(tidyverse)
+library(ComplexHeatmap)
+library(cowplot)
+library(phyloseq)
+library(microbiomeMarker)
+#Load the data
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+set.seed(1)
+#sample_data(ps3_Archaea)
+
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
+lefse_cc_path_Genus_archaea <- run_lefse(
+    ps3_Archaea,
+    wilcoxon_cutoff = 0.05,
+    group = "Genotype",
+    kw_cutoff = 0.05,
+    multigrp_strat = TRUE,
+    lda_cutoff =2,
+    taxa_rank="Genus"
+)
+lefse_cc_path_Genus_archaea
+sig_marker_lefse<-data.frame(marker_table(lefse_cc_path_Genus_archaea))
+
+plot_abundance(lefse_cc_path_Genus_archaea, group="Genotype")
+Lefse_archaea=plot_ef_bar(lefse_cc_path_Genus_archaea);Lefse_archaea
+
+```
+
+
 #Random forest classifiers of plant genpotype (using the seed microbiome)
 #Load packages 
 ```{r}
@@ -3009,6 +3186,8 @@ dev.off()
 Figures combined
 #Rarefaction
 ```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+
 tiff("Rarefaction.tiff", units="in", width=9, height=3.5, res=300)
 Rarefaction.tiff=(Rareaction_Bacteria+Rareaction_Fungi+Rareaction_Archaea+plot_layout(nrow = 1, byrow = FALSE));Rarefaction.tiff
 dev.off()
@@ -3052,6 +3231,155 @@ tiff("Core_Microbiome_archaea.tiff", units="in", width=9, height=5, res=300)
 Core_Microbiome_archaea.tiff=(p_core_flex1_all_Archaea+plot_layout(nrow = 1, byrow = FALSE));Core_Microbiome_archaea.tiff
 dev.off()
 ```
+
+
+
+
+
+#Correlation
+```{r}
+#Extract Bacterial Diversity
+#To extract bacterial diversity, you can subset the phyloseq object by taxonomy level (e.g., Kingdom = #"Bacteria").
+bacteria_ps <- ps3_Bacteria
+bacteria_diversity <- estimate_richness(bacteria_ps, measures = c("Shannon", "Observed"));bacteria_diversity
+
+#Extract Fungal Diversity
+#Similarly, extract fungal diversity using a filter for Kingdom = "Fungi".
+
+fungi_ps <- bacteria_ps <- ps3_Fungi
+fungal_diversity <- estimate_richness(fungi_ps, measures = c("Shannon", "Observed"));fungal_diversity
+
+#3. Merge the Diversity Data
+#Next, combine the bacterial and fungal diversity data. Assuming both datasets have the same sample IDs, you can merge them:
+
+diversity_data <- cbind(bacteria_diversity, fungal_diversity);diversity_data
+colnames(diversity_data)[1] <- "Bacteria_richness"
+colnames(diversity_data)[2] <- "Bacteria_Shannon"
+colnames(diversity_data)[3] <- "Fungal_richness"
+colnames(diversity_data)[4] <- "Fungal_Shannon"
+diversity_data
+
+write.csv(diversity_data, "diversity_data.csv")
+```
+
+#correlate richness
+
+```{r}
+#https://bookdown.org/content/b298e479-b1ab-49fa-b83d-a57c2b034d49/correlation.html#correlogram
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+dat=read.csv("diversity_data.csv", header = T);dat
+
+
+# basic scatterplot
+ggplot(dat, aes(x=Bacteria_richness, y=Fungal_richness, alpha=Genotype)) + 
+    geom_point(size=6, color="#69b3a2") +
+    theme_ipsum()
+```
+
+
+```{r}
+library(GGally)
+# Check correlation between variables
+#cor(dat)
+ggcorr(dat) 
+ 
+# Nice visualization of correlations
+ 
+# Check correlations (as scatterplots), distribution and print corrleation coefficient 
+ggpairs(dat, columns = 2:5, ggplot2::aes(colour=Genotype)) +
+  theme(text = element_text(size = 1))  # Reduce overall text size
+```
+
+
+```{r}
+library(GGally)
+
+ggpairs(dat, columns = 2:5, 
+        ggplot2::aes(colour = Genotype),
+        upper = list(continuous = wrap("points", size = 1)),
+        lower = list(continuous = wrap("points", size = 1)),
+        diag = list(continuous = wrap("densityDiag")),
+        title = "Pair Plot") +
+  theme(text = element_text(size = 8))  # Reduce overall text size
+
+```
+
+
+```{r}
+#https://rpubs.com/Alema/1000474
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+dat=read.csv("diversity_data.csv", header = T);dat
+library(GGally)
+ggpairs(dat, columns = 2:5, title="correlogram with ggpairs()") 
+```
+
+
+```{r}
+# Nice visualization of correlations
+ggpairs(dat, columns = 2:5, ggplot2::aes(colour=as.character(Genotype)))
+```
+
+
+
+#Preleminary test to check the test assumptions
+#data are normally distributed
+#Is the covariation linear? Yes, form the plot, the relationship is linear. In the situation where the scatter plots show curved patterns, we are dealing with nonlinear association between the two variables.
+#Are the data from each of the 2 variables (x, y) follow a normal distribution?
+
+#Use Shapiro-Wilk normality test -> R function: shapiro.test() and look at the normality plot -> R function: ggpubr::ggqqplot()
+
+#Shapiro-Wilk test can be performed as follow:
+
+#Null hypothesis: the data are normally distributed Alternative hypothesis: the data are not normally distributed
+```{r}
+#install.packages("ggpubr")
+library(ggpubr)
+
+shapiro.test(dat$Bacteria_richness)
+#data:  dat$Bacteria_richness
+#W = 0.76335, p-value = 1.508e-05
+
+shapiro.test(dat$Bacteria_Shannon)
+#data:  dat$Bacteria_Shannon
+#W = 0.86125, p-value = 0.001077
+
+shapiro.test(dat$Fungal_richness)
+#W = 0.91085, p-value = 0.01563
+
+shapiro.test(dat$Fungal_Shannon)
+#W = 0.91628, p-value = 0.02149
+```
+
+
+#data are not normally distributed
+#If the data are not normally distributed, it’s recommended to use the non-parametric correlation, including Spearman and Kendall rank-based correlation tests.
+```{r}
+#Spearman rank correlation coefficient
+cor.test(dat$Bacteria_richness, dat$Fungal_richness,  method = "spearman")
+
+#Warning: Cannot compute exact p-value with ties
+#	Spearman's rank correlation rho
+
+#data:  dat$Bacteria_richness and dat$Fungal_richness
+#S = 1550.9, p-value = 8.583e-05
+#alternative hypothesis: true rho is not equal to 0
+#sample estimates:
+#      rho 
+#0.6549767 
+
+cor.test(dat$Bacteria_richness, dat$Fungal_richness,  method = "kendall")
+#Warning: Cannot compute exact p-value with ties
+#	Kendall's rank correlation tau
+
+#data:  dat$Bacteria_richness and dat$Fungal_richness
+#z = 3.7155, p-value = 0.0002028
+#alternative hypothesis: true tau is not equal to 0
+#sample estimates:
+#      tau 
+#0.4820423 
+```
+
+
 
 
 
