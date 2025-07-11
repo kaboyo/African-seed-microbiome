@@ -3271,9 +3271,13 @@ dat=read.csv("diversity_data.csv", header = T);dat
 
 
 # basic scatterplot
-ggplot(dat, aes(x=Bacteria_richness, y=Fungal_richness, alpha=Genotype)) + 
+corr1=ggplot(dat, aes(x=Bacteria_richness, y=Fungal_richness, alpha=Genotype)) + 
     geom_point(size=6, color="#69b3a2") +
-    theme_ipsum()
+    theme_ipsum();corr1
+
+tiff("corr1.tiff", units="in", width=9, height=5, res=300)
+corr1.tiff=(corr1+plot_layout(nrow = 1, byrow = FALSE));corr1.tiff
+dev.off()
 ```
 
 
@@ -3286,23 +3290,21 @@ ggcorr(dat)
 # Nice visualization of correlations
  
 # Check correlations (as scatterplots), distribution and print corrleation coefficient 
-ggpairs(dat, columns = 2:5, ggplot2::aes(colour=Genotype)) +
-  theme(text = element_text(size = 1))  # Reduce overall text size
-```
+corr2=ggpairs(dat, columns = 2:5, ggplot2::aes(colour=Genotype));corr2  # Reduce overall text size
 
-
-```{r}
-library(GGally)
-
-ggpairs(dat, columns = 2:5, 
-        ggplot2::aes(colour = Genotype),
-        upper = list(continuous = wrap("points", size = 1)),
-        lower = list(continuous = wrap("points", size = 1)),
-        diag = list(continuous = wrap("densityDiag")),
-        title = "Pair Plot") +
-  theme(text = element_text(size = 8))  # Reduce overall text size
+ ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/corr2.tiff",     
+  plot = corr2,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
 
 ```
+
+
+
 
 
 ```{r}
@@ -3310,15 +3312,18 @@ ggpairs(dat, columns = 2:5,
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 dat=read.csv("diversity_data.csv", header = T);dat
 library(GGally)
-ggpairs(dat, columns = 2:5, title="correlogram with ggpairs()") 
+corr3=ggpairs(dat, columns = 2:5, title="correlogram with ggpairs()");corr3
+
+
+ ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/corr3.tiff",     
+  plot = corr3,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
 ```
-
-
-```{r}
-# Nice visualization of correlations
-ggpairs(dat, columns = 2:5, ggplot2::aes(colour=as.character(Genotype)))
-```
-
 
 
 #Preleminary test to check the test assumptions
@@ -3367,16 +3372,22 @@ cor.test(dat$Bacteria_richness, dat$Fungal_richness,  method = "spearman")
 #      rho 
 #0.6549767 
 
-cor.test(dat$Bacteria_richness, dat$Fungal_richness,  method = "kendall")
-#Warning: Cannot compute exact p-value with ties
-#	Kendall's rank correlation tau
+cor.test(dat$Bacteria_Shannon, dat$Fungal_Shannon,  method = "spearman")
 
-#data:  dat$Bacteria_richness and dat$Fungal_richness
-#z = 3.7155, p-value = 0.0002028
-#alternative hypothesis: true tau is not equal to 0
+#	Spearman's rank correlation rho
+
+#data:  dat$Bacteria_Shannon and dat$Fungal_Shannon
+#S = 944, p-value = 1.45e-06
+#alternative hypothesis: true rho is not equal to 0
 #sample estimates:
-#      tau 
-#0.4820423 
+#      rho 
+#0.7899889  
+library(ggpubr)
+sp <- ggscatter(dat, x = "Bacteria_richness", y = "Fungal_richness",
+   color = "Genotype", palette = "jco",
+   add = "reg.line", conf.int = TRUE)
+sp + stat_cor(aes(color = Genotype), label.x = 3)
+
 ```
 
 
