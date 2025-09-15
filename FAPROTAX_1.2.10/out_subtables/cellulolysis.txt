@@ -1,0 +1,12 @@
+#record	A1_b	A2_b	A3_b	A4_b	A5_b	A6_b	B1_b	B2_b	B3_b	B4_b	B5_b	B6_b	C1_b	C2_b	C3_b	C4_b	C5_b	C6_b	D1_b	D2_b	D3_b	D4_b	D5_b	D6_b	E1_b	E2_b	E3_b	E4_b	E5_b	E6_b
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	14	0	0	36	38	44	38	24	0	0	0	20	12	8	552	624	188	858	864	380
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0
+Bacteria; Bacteroidetes; Bacteroidia; Cytophagales; Spirosomaceae; Dyadobacter	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	22	0	0	0	0	0	0	0	0	0	0	0	258	122	0	178	320	156
+Bacteria; Bacteroidetes; Bacteroidia; Cytophagales; Cytophagaceae; Sporocytophaga	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Bacteroidetes; Bacteroidia; Cytophagales; Spirosomaceae; Dyadobacter	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4	0	0
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2
+Bacteria; Actinobacteria; Actinobacteria; Micrococcales; Promicromonosporaceae; Cellulosimicrobium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0

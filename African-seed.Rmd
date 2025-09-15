@@ -10,6 +10,8 @@ microbiome")
 #replace this with your working directory
 ```{r, echo=F, warning= F}
 setwd("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome")
+
+
 library(phyloseq);packageVersion("phyloseq")#‘1.46.0’
 library(vegan);packageVersion("vegan")# ‘2.6.4’
 library(genefilter);packageVersion("genefilter")#‘1.84.0’
@@ -267,7 +269,7 @@ sums_ps1_Bacteria
 ```
 
 
-#Filter data at 0.025 prevalence
+#Filter data at 0.25 prevalence %
 
 #Obtained from: https://f1000research.com/articles/5-1492/v1;#One of the reasons to filter by prevalence is to avoid spending #much time analyzing taxa that were only rarely seen. This also turns out to be a useful filter of noise (taxa that are #actually just artifacts of the data collection process)
 # Define prevalence of each taxa; # (in how many samples did each taxa appear at least once)
@@ -290,7 +292,7 @@ prevdf1 = subset(prevdf, Phylum %in% names(keepPhyla))
 
 # Define prevalence threshold as 0.25% of total samples# 
 prevalenceThreshold = 0.0025 * nsamples(ps1_Bacteria)
-prevalenceThreshold
+prevalenceThreshold#0.075
 
 # Execute prevalence filter, using `prune_taxa()` function
 ps2_Bacteria_Bacteria = prune_taxa((prev0 > prevalenceThreshold), ps1_Bacteria);ps2_Bacteria_Bacteria
@@ -356,7 +358,7 @@ asv_prev_rel_taxo <- merge(taxo,
 asv_tdf <- rownames_to_column(as.data.frame(t(asv)),
                            "replicates")
 library(dplyr)
-meta <- meta %>% rename(replicates = 1)
+meta <- meta <- meta %>% rename_with(~ "replicates", 1)
 colnames(meta)
 
 colnames(asv_tdf)
@@ -1342,7 +1344,7 @@ asv_prev_rel_taxo <- merge(taxo,
 asv_tdf <- rownames_to_column(as.data.frame(t(asv)),
                            "replicates")
 library(dplyr)
-meta <- meta %>% rename(replicates = 1)
+meta <- meta <- meta %>% rename_with(~ "replicates", 1)
 colnames(meta)
 
 colnames(asv_tdf)
@@ -2337,7 +2339,7 @@ asv_prev_rel_taxo <- merge(taxo,
 asv_tdf <- rownames_to_column(as.data.frame(t(asv)),
                            "replicates")
 library(dplyr)
-meta <- meta %>% rename(replicates = 1)
+meta <- meta <- meta %>% rename_with(~ "replicates", 1)
 colnames(meta)
 
 colnames(asv_tdf)
@@ -3391,6 +3393,258 @@ sp + stat_cor(aes(color = Genotype), label.x = 3)
 ```
 
 
+#Functional studies using the microco packages
+
+#using the microeco package, we use the file convention there to compute for the assignment of microbiome functions of the seed bacterial community
+##https://chiliubio.github.io/microeco_tutorial/explainable-class.html
+#https://chiliubio.github.io/microeco_tutorial/basic-class.html#microtable-class
+# Dataset objects
+
+```{r}
+#Load packages 
+#Load the functions
+library(microeco)
+library(magrittr)
+library(ggplot2)
+library(aplot)
+library(phyloseq)
+source("phylo-meco.txt")
+library(ggh4x)
+library(ggradar)
+library(ggnested)
+library(circlize)  # to create continuous color gradients
+library(dplyr)  # wrangling tidy tables
+library(grid)  # to define witdth / height of annotations using grid::unit()
+library(ragg)  # to generate high quality graphics
+library(RColorBrewer)  # to access predefined color palettes
+library(tibble)  # to convert data.frames to tibbles
+library(tidyHeatmap) # the main act: plotting & annotating heatmaps
+library(readr)
+library(edgeR)
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(ape)
+library(plyr)
+library(gplots)
+library(lme4)
+library(tidyr)
+library(vegan)
+library(scales)
+library(gridExtra)
+library(grid)
+library(reshape2)
+library(phyloseq)
+library(stringr)
+library(compositions)
+library(zCompositions)
+
+##Side comment: Do I need all these packages? No, probably not. But it is more convenient generaly to copy and paste most of these packages into every document.
 
 
+m.g.colors <- c( "#999999", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#CBD588", "#5F7FC7", "orange","#DA5724", "#508578", "#CD9BCD",
+   "#AD6F3B", "#673770","#D14285", "#652926", "#C84248", 
+  "#8569D5", "#5E738F","#D1A33D", "#8A7C64", "#599861" );m.g.colors
+
+theme_set(theme_classic(base_size = 14))
+
+#Bacteria
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+
+#Fungi
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+
+
+```
+#Convert to phyloseq object
+#ps_Bacteria <- merge_phyloseq(
+#  asv_tab_bac,
+# tax_tab_bac, 
+# metadata_bac);ps_Bacteria#[ 16460 taxa & 1197 samples ]
+#summarize_phyloseq(ps_Bacteria)
+
+
+#Bacterial community
+```{r}
+#object=ps3_Bacteria
+taxdf = data.frame(tax_table(ps3_Bacteria))
+taxdf[1:4,1:4]
+colnames(taxdf) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
+
+#FAPROTAX wants one string with all the column names.
+taxdf$taxstring = paste(taxdf$Kingdom, taxdf$Phylum, taxdf$Class, taxdf$Order, taxdf$Family, taxdf$Genus, sep="; ")
+taxdf[1:4,]
+
+#We’re now appending the taxonomy string as a column to the otu table. Save the otu table as a .tsv file and tell R to use a tab character as the separater. Quotes around the values will break FAPROTAX.
+otutable=data.frame(otu_table(ps3_Bacteria));otutable
+otutable$taxonomy = taxdf[as.vector(row.names(otutable)),"taxstring"]
+otutable[1:4,]
+
+write.table(otutable, "faprotax.taxon.table.tsv", sep = "\t", quote=FALSE)
+```
+
+
+#Run FAPROTAX
+#FAPROTAX is a command line utility that relys on having python 3 installed on your system. I personally have had dependency problems running FAPROTAX with python 3.9 and recommend using python 3.7.
+
+#In terminal or a shell of your choice, navigate to the directory where you have downloaded and unpacked FAPROTAX. Handy reminders on UNIX vs MsDOS file system navigation.
+
+#If you are running MacOS or a Linux based OS:
+
+```{r}
+#./collapse_table.py -i faprotax.taxon.table.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
+
+If you are running Windows:
+#python collapse_table.py -i faprotax.taxon.table.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
+```
+
+
+
+#You may recieve many messages warning you that ‘is’ != ==, but don’t worry. It’s working.
+
+#An explanation of all of the flags we used:
+
+#./collapse_table.py or python collapse_table.py runs the main faprotax program
+#-i faprotax.taxon.table.tsv this is the argument for the name of your input file.
+#-o out.functable.tsv this is the argument for the name of the output file you want.
+#-g FAPROTAX.txt this is the name of the faprotax database. don’t change this.
+#-c ‘#’ this tells faprotax that ‘#’ is the comment character. don’t change.
+#-d taxonomy this tells faprotax to look for taxonomy information in the column named ‘taxonomy’. you would only change this if you changed the name of the column in the R code.
+#–omit_columns 0 this tells faprotax to ignore the first column, which is just OTU names.
+#–column_names_are_in_last_comment_line this tells faprotax where the sample names are. don’t change.
+#-r out.report.txt this gives faprotax the name for the report file to create.
+#-v this makes visible output on your screen while faprotax is working. I find it reassuring.
+#-s out_subtables/ this tells faprotax to separate out and save otu_tables for each functional groups and store them in a folder called out_subtables. You don’t need to make that folder first, faprotax will do it for you.
+#-f this is optional. It tells faprotax that it’s okay to overwrite filenames. I put this in there when I was troubleshooting this script and didn’t want to keep making new file names.
+#You can read additional documentation on how to run FAPROTAX on their website.
+
+
+#FAPROTAX results
+#Broad patterns
+#First we’ll look at the major functions FAPROTAX identified in the samples regardless of taxonomy.
+
+#You must remove the comment symbol from the first line of the results tsv for the following to work.
+
+
+```{r}
+otu.function.table <- read.table("FAPROTAX_1.2.10/out.functable.tsv", sep="\t", header=TRUE, row.names=1);otu.function.table
+
+#Discard functions identified in fewer than 10 reads
+otu.function.table <- otu.function.table[which(rowSums(otu.function.table) > 10),]
+#Discard samples where no functions were identified
+otu.function.table <- otu.function.table[,which(colSums(otu.function.table) > 1)]
+otu.function.table[1:4,1:4]
+```
+
+
+```{r}
+#Check how many functions were identified
+dim(otu.function.table)
+```
+
+
+```{r}
+#This normalizes the read counts to the total function identifications for each samples. An imperfect solution since FAPROTAX most likely did not assign a function to all of your OTUS. To check FAPROTAX's performance, read the report file.
+
+rel.otu.fn.table <- apply(otu.function.table,MARGIN = 2, FUN = function(x) x/sum(x))
+
+rel.otu.fn.df <- data.frame(rel.otu.fn.table)
+rel.otu.fn.df
+```
+
+
+
+#Microeco package
+```{r,echo=FALSE,warning=FALSE}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
+
+mt=phyloseq2meco(ps3_Bacteria);mt
+#phy=meco2phyloseq(mt);phy # microeco to phyloseq
+class(mt$otu_table)
+class(mt$tax_table)
+class(mt$sample_table)
+class(mt$phylo_tree)
+#convert the microeco object
+mt=microtable$new(sample_table = mt$sample_table, otu_table = mt$otu_table, tax_table = mt$tax_table);mt
+class(mt)
+mt$sample_table
+#The trans_env & trans_func classes are placed into the section ‘Explainable class’, as environmental factors & microbial functions can be generally applied to explain microbial community structure & assembly.
+
+## Imported metadata file
+#env_data <- read.table("env_data.txt", header=TRUE, sep="\t",row.names="SampleID");env_data
+
+#mt$sample_table <- data.frame(mt$sample_table, env_data[rownames(mt$sample_table), ])
+#mt$sample_table
+#alternatively create another dataframe & append to the microeco object
+#t1 <- trans_env$new(dataset = mt, add_data = env_data[, 1:12]);t1 
+#t1$data_env
+
+```
+#trans_func class
+#Ecological researchers are usually interested in the the funtional profiles of microbial communities, because functional or metabolic data is powerful to explain the structure & dynamics of microbial communities. As metagenomic sequencing is complicated & expensive, using amplicon sequencing data to predict functional profiles is an alternative choice. Several software are often used for this goal, such as PICRUSt (Langille et al. 2013), Tax4Fun (Aßhauer et al. 2015) & FAPROTAX (Stilianos Louca et al. 2016; S. Louca, Parfrey, & Doebeli 2016). These tools are great to be used for the prediction of functional profiles based on the prokaryotic communities from sequencing results. In addition, it is also important to obtain the traits or functions for each taxa, not just the whole profile of communities. FAPROTAX database is a collection of the traits & functions of prokaryotes based on the known research results published in books & literatures. We match the taxonomic information of prokaryotes against this database to predict the traits of prokaryotes on biogeochemical roles. The NJC19 database (Lim et al. 2020) is also available for animal-associated prokaryotic data, such as human gut microbiota. We also implement the FUNGuild (Nguyen et al. 2016) & FungalTraits (Põlme et al. 2020) databases to predict the fungal traits. The idea identifying prokaryotic traits & functional redundancy was initially inspired by our another study (C. Liu et al. 2022).
+```{r,echo=FALSE,warning=FALSE}
+t1 <- trans_func$new(mt)
+t1$sample_table
+t1$cal_spe_func(prok_database = "FAPROTAX")
+t1$cal_spe_func_perc(abundance_weighted = TRUE)
+# it is better to clone a dataset
+tmp_mt <- clone(mt);tmp_mt
+# transpose res_spe_func_perc to be a data.frame like taxonomic abundance
+tmp <- as.data.frame(t(t1$res_spe_func_perc), check.names = FALSE);tmp
+# assign the table back to taxa_abund list for further analysis
+tmp_mt$taxa_abund$func <- tmp
+# select the "func" in taxa_abund list in trans_diff
+t2 <- trans_diff$new(dataset = tmp_mt, method = "anova", group = "Genotype", taxa_level = "func");t2
+
+Relative_bacterial_func=t2$plot_diff_abund(add_sig = T) + ggplot2::ylab("Relative abundance (%)");Relative_bacterial_func
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Relative_bacterial_func.tiff",     
+  plot = Relative_bacterial_func,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
+
+t2$trans_spe_func_perc()
+t2$plot_spe_func_perc()
+```
+
+
+#Network
+```{r}
+# construct a network for the example
+network <- trans_network$new(dataset = mt, cal_cor = "base", taxa_level = "OTU", filter_thres = 0.0001, cor_method = "spearman");network
+network$cal_network(p_thres = 0.05, COR_cut = 0.7)
+network$cal_module()
+# convert module info to microtable object
+meco_module <- network$trans_comm(use_col = "module")
+meco_module_func <- trans_func$new(meco_module)
+meco_module_func$cal_spe_func(prok_database = "FAPROTAX")
+meco_module_func$cal_spe_func_perc(abundance_weighted = FALSE)
+Network_bacterial_func=meco_module_func$plot_spe_func_perc(order_x = paste0("M", 1:10));Network_bacterial_func
+
+ ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Network_bacterial_func.tiff",     
+  plot = Network_bacterial_func,
+   scale = 1,
+ width = 25,
+  height = 20,
+  units = c("cm"),
+ dpi = 600)
+ 
+ 
+ 
+ # If you want to change the group list, reset the list t2$func_group_list
+meco_module_func$func_group_list
+# use show_prok_func to see the detailed information of prokaryotic traits
+meco_module_func$show_prok_func("methanotrophy")
+```
+
+
+
+```{r}
+
+```
 

@@ -1,0 +1,8 @@
+#
+#record	A1_a	A2_a	A3_a	A4_a	A5_a	A6_a	B1_a	B2_a	B3_a	B4_a	B5_a	B6_a	C1_a	C2_a	C3_a	C4_a	C5_a	C6_a	D1_a	D2_a	D3_a	D4_a	D5_a	D6_a	E1_a	E2_a	E3_a	E4_a	E5_a	E6_a
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; uncultured_archaeon	0	0	0	0	0	0	0	0	0	0	0	0	192	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; Unidentified_Nitrososphaeraceae	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6	0	0	0	0	0	0	0	0	0
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; uncultured_archaeon	0	0	0	0	0	0	0	0	0	0	0	0	474	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; uncultured_archaeon	0	0	0	0	0	0	0	0	0	0	0	0	132	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; Unidentified_Nitrososphaeraceae	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	100	0	0	0	0	0	0	0	0	0	0
+Archaea; Thaumarchaeota; Nitrososphaeria; Nitrososphaerales; Nitrososphaeraceae; Unidentified_Nitrososphaeraceae	0	0	0	0	0	0	0	0	0	0	0	0	32	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0

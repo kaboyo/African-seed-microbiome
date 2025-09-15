@@ -1,0 +1,25 @@
+#record	A1_b	A2_b	A3_b	A4_b	A5_b	A6_b	B1_b	B2_b	B3_b	B4_b	B5_b	B6_b	C1_b	C2_b	C3_b	C4_b	C5_b	C6_b	D1_b	D2_b	D3_b	D4_b	D5_b	D6_b	E1_b	E2_b	E3_b	E4_b	E5_b	E6_b
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Gammaproteobacteria; Legionellales; Legionellaceae; Legionella	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	10	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Rickettsiaceae; Rickettsia	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Rickettsiaceae; Rickettsia	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; SM2D12; Unidentified	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	8	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Simkaniaceae; Unidentified_Simkaniaceae	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Chlamydiaceae; Unidentified_Chlamydiaceae	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	8
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	6	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Gammaproteobacteria; Legionellales; Legionellaceae; Legionella	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Parachlamydiaceae; Candidatus_Protochlamydia	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4	0	4	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Parachlamydiaceae; Candidatus_Protochlamydia	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; cvE6; uncultured_bacterium	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	4	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Unidentified_Rickettsiales; Unidentified_Rickettsiales	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Simkaniaceae; Unidentified_Simkaniaceae	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Rickettsiaceae; Rickettsia	0	0	0	0	0	0	4	0	0	16	0	0	0	0	0	0	2	6	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Anaplasmataceae; Wolbachia	0	0	2	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; Rickettsiaceae; Candidatus_Megaira	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	14
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Parachlamydiaceae; Candidatus_Protochlamydia	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	16	0	0	0	0	0
+Bacteria; Proteobacteria; Gammaproteobacteria; Legionellales; Legionellaceae; Legionella	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	6	0	0	10	0	0
+Bacteria; Proteobacteria; Alphaproteobacteria; Rickettsiales; SM2D12; Unidentified	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0
+Bacteria; Chlamydiae; Chlamydiae; Chlamydiales; Simkaniaceae; uncultured	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	2	0	0	0	0	0	0	0

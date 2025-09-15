@@ -1,0 +1,6 @@
+#record	A1_b	A2_b	A3_b	A4_b	A5_b	A6_b	B1_b	B2_b	B3_b	B4_b	B5_b	B6_b	C1_b	C2_b	C3_b	C4_b	C5_b	C6_b	D1_b	D2_b	D3_b	D4_b	D5_b	D6_b	E1_b	E2_b	E3_b	E4_b	E5_b	E6_b
+Bacteria; Proteobacteria; Gammaproteobacteria; Oceanospirillales; Alcanivoracaceae; Alcanivorax	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	12	0	0	0	0	0	0	0	0	0	0	0	0
+Bacteria; Proteobacteria; Gammaproteobacteria; Oceanospirillales; Alcanivoracaceae; Alcanivorax	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	18	0	0	8	12	18
+Bacteria; Actinobacteria; Actinobacteria; Corynebacteriales; Nocardiaceae; Rhodococcus	0	0	0	0	0	0	6	0	0	0	12	0	0	16	0	0	12	10	0	0	10	4	0	0	0	0	0	0	0	0
+Bacteria; Actinobacteria; Actinobacteria; Corynebacteriales; Nocardiaceae; Rhodococcus	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	14
+Bacteria; Actinobacteria; Actinobacteria; Corynebacteriales; Nocardiaceae; Unidentified_Rhodococcus	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	0	52	54	0	48	46	0
