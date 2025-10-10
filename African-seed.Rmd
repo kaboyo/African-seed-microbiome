@@ -9,9 +9,7 @@ microbiome")
 
 #replace this with your working directory
 ```{r, echo=F, warning= F}
-setwd("/Users/expeditoolimi/Documents/Southampton/Global_tomato_seed_Microbiome/Tomato100_Project/Tomato-seed-microbiome")
-
-
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
 library(phyloseq);packageVersion("phyloseq")#‘1.46.0’
 library(vegan);packageVersion("vegan")# ‘2.6.4’
 library(genefilter);packageVersion("genefilter")#‘1.84.0’
@@ -132,6 +130,28 @@ source("RSCRIPT_parwise.adonis.txt")
 source("plot_hierarchy.R")
 #https://sites.northwestern.edu/researchcomputing/resources/using-git-&-github-with-r-rstudio/#github-r config
 ```
+
+
+
+#Beta diversity
+#CSS transformation
+```{r}
+setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
+  # require(metagenomeSeq)
+  MGS <- phyloseq::phyloseq_to_metagenomeSeq(physeq)
+  # get the normalized count matrix
+  otu_norm <- metagenomeSeq::MRcounts(MGS, norm = norm, log = log, ...)
+  # exportMat(datt.norm, file = "tmp.txt")    # norm = TRUE, log = TRUE
+  ## save sample statistics (sample scaling factor, quantile value, number of identified features and library size):
+  # exportStats(dattM.sf, file = "tmp_stats.txt")
+  # Substitue raw abundance to the css-normalized data
+  physeq.tr <- physeq
+  phyloseq::otu_table(physeq.tr) <- phyloseq::otu_table(otu_norm, taxa_are_rows = T)
+  return(physeq.tr)
+}
+```
+
 
 
 #Load colors for identifying the different samples
@@ -510,29 +530,26 @@ library(microbiomeutilities)
 set.seed(1)
 subsamples <- seq(0, 50000, by=10000)[-1]
 #subsamples = c(10, 5000, 10000, 20000, 30000)
-
-Rareaction_Bacteria <- plot_alpha_rcurve(ps3_Bacteria, index="observed",
+Rarefaction_Bacteria <- plot_alpha_rcurve(ps3_Bacteria, index="observed",
             subsamples = subsamples,
             lower.conf = 0.025, 
             upper.conf = 0.975,
             group="Genotype",
             label.color = "brown3",
             label.size = 3,
-            label.min = TRUE);Rareaction_Bacteria
-
-Rareaction_Bacteria <- Rareaction_Bacteria + scale_color_manual(values = mycola) + 
+            label.min = TRUE);Rarefaction_Bacteria
+Rarefaction_Bacteria <- Rarefaction_Bacteria + scale_color_manual(values = mycola) + 
   scale_fill_manual(values = mycola)+ 
   theme(axis.text=element_text(size=8), panel.grid=element_blank(),
         strip.background = element_rect(colour=NA,fill="grey33"),
         strip.text.x = element_text(face="bold"))+
   theme(text=element_text(size=14,  family="sans"))+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
-  theme(legend.position="none")+
-  labs(tag = "")
-print(Rareaction_Bacteria)
+  theme(legend.position="right")+
+  labs(tag = "")+    expand_limits(x = 0, y = 0); Rarefaction_Bacteria
 
-tiff("p_bact.tiff", units="in", width=12, height=5, res=300)
-ggsave("p_bact.tiff", plot = Rareaction_Bacteria)
+#tiff("p_bact.tiff", units="in", width=12, height=5, res=300)
+#ggsave("p_bact.tiff", plot = Rarefaction_Bacteria)
 
 ```
 
@@ -631,74 +648,73 @@ head(df_Genus,20)
 
 
 
-#Computing the beta-diversity plots & stats
-#USING THE MicrobiotaProcess package
 
-#https3_Bacteria://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.htm
-#https3_Bacteria://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html
-#library(MicrobiotaProcess)
-#Will consider the transformation by hellinger approach
+#Beta diversity
 
-##Consider the cultivars
-```{r,echo=FALSE, warning=FALSE}
+```{r}
+phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
+  # require(metagenomeSeq)
+  MGS <- phyloseq::phyloseq_to_metagenomeSeq(physeq)
+  # get the normalized count matrix
+  otu_norm <- metagenomeSeq::MRcounts(MGS, norm = norm, log = log, ...)
+  # exportMat(datt.norm, file = "tmp.txt")    # norm = TRUE, log = TRUE
+  ## save sample statistics (sample scaling factor, quantile value, number of identified features and library size):
+  # exportStats(dattM.sf, file = "tmp_stats.txt")
+  # Substitue raw abundance to the css-normalized data
+  physeq.tr <- physeq
+  phyloseq::otu_table(physeq.tr) <- phyloseq::otu_table(otu_norm, taxa_are_rows = T)
+  return(physeq.tr)
+}
+```
+
+
+```{r}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
-library(MicrobiotaProcess)
-
-distme <- get_dist(ps3_Bacteria, distmethod ="bray", method="hellinger");distme
-sampleda <- data.frame(sample_data(ps3_Bacteria), check.names=FALSE);sampleda
-sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
-sampleda$Genotype <- factor(sampleda$Genotype)
-adores <- adonis2(distme ~ Genotype, 
-                  data=sampleda, 
-                  permutation=999);adores
-
-#           Df SumOfSqs       R2      F Pr(>F)    
-#Model     4   6.6151 0.85924 38.152  0.001 ***
-#Residual 25   1.0837 0.14076                  
-#Total    29   7.6988 1.00000                  
-#---
+ps3_Bacteria_css = phyloseq_transform_css(ps3_Bacteria);ps3_Bacteria_css#########
+#First get otu_table and transpose it:
+dist.matrix_ps3_Bacteria_css <- t(data.frame(otu_table(ps3_Bacteria_css)))
+sampledf_ps3_Bacteria_css <- data.frame(sample_data(ps3_Bacteria_css))
+#Then use vegdist from vegan to generate a bray distance object:
+phyloseq_bray_ps3_Bacteria_css <- vegdist(dist.matrix_ps3_Bacteria_css, method = "bray"); phyloseq_bray_ps3_Bacteria_css
+sampleda <- data.frame(sample_data(ps3_Bacteria_css), check.names=FALSE);sampleda
+sampleda <- sampleda[match(colnames(as.matrix(phyloseq_bray_ps3_Bacteria_css)),rownames(sampleda)),,drop=FALSE];sampleda
+sampleda$Sample_type <- factor(sampleda$Sample_type)
+adores <- adonis2(phyloseq_bray_ps3_Bacteria_css ~ Genotype, data=sampleda, permutation=999);adores#change from adonis to adonis2
+#         Df SumOfSqs     R2      F Pr(>F)    
+#Model     4   5.7450 0.7026 14.765  0.001 ***
+#Residual 25   2.4318 0.2974                  
+#Total    29   8.1768 1.0000                  
 #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-###################################################################################################
-# "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
-pcares <- get_pca(obj=ps3_Bacteria, method="hellinger");pcares# for PCA ordination to show sample distribution
-pcoares <- get_pcoa(obj=ps3_Bacteria, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
+#############################
+ps3_Bacteria_css = phyloseq_transform_css(ps3_Bacteria);ps3_Bacteria_css#########
+#visualize
+matrixdistance_ps3_Bacteria_css_PCoA <- ordinate(physeq = ps3_Bacteria_css, method = "PCoA", distance = "bray", trymax = 1000)
+#Stress:     0.2069558 
 
-##Plot PCoA considering the cultivars
-pcaplot1_bacteria.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
-                       factorNames=c("Genotype"), ellips3_Bacteriae=F)+
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_bacteria.tiff
-#ggsave("pcaplot1_bacteria.tiff", plot = pcaplot1_bacteria.tiff)
-# pc = c(1, 3) to show the first & third principal components.
+pcoaplot1_bacteria.tiff=plot_ordination(physeq = ps3_Bacteria_css, ordination = matrixdistance_ps3_Bacteria_css_PCoA, color = "Genotype") + 
+  theme(text = element_text(size = 12)) + scale_color_manual(values =mycola)+theme(legend.title=element_blank())+  geom_point(aes(color =Genotype ), size = 5)+
+  scale_shape_manual(values=c(19,17, 15,18))+ theme_gray(base_size = 14)+ labs(tag = "C")+
+  theme(legend.position="");pcoaplot1_bacteria.tiff
+#tiff("pcoaplot1_bacteria.tiff", units="in", width=5, height=5, res=300)
+#ggsave("pcoaplot1_bacteria.tiff", plot = pcoaplot1_bacteria.tiff)
+#dev.off()
 
-pcoaplot1_bacteria.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
-                        factorNames=c("Genotype"), ellips3_Bacteriae=F) +
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_bacteria.tiff
-#ggsave("pcoaplot1_bacteria.tiff.TIFF", plot = pcoaplot1_bacteria.tiff);pcoaplot1_bacteria.tiff
+```
 
-#Combine the figures
-tiff("PCOA_Bacteria_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Bacteria_cultitvars.tiff=pcaplot1_bacteria.tiff+pcoaplot1_bacteria.tiff+plot_layout(ncol = 2);PCOA_Bacteria_cultitvars.tiff
-ggsave("PCOA_Bacteria_cultitvars.tiff", plot = PCOA_Bacteria_cultitvars.tiff)
-dev.off()
-###################################################################################################
+
+#Beta dispersion tests & plot
+```{r}
+dist=phyloseq_bray_ps3_Bacteria_css
+dispr <- vegan::betadisper(dist, phyloseq::sample_data(ps3_Bacteria_css)$Genotype);dispr #calculate the dispersion
+
+data_fram_cultivar <- data.frame(Distance_to_centroid=dispr$distances,Group=dispr$group);data_fram_cultivar
+groups <- dispr$group
+
+#stats
+kruskal.test(Distance_to_centroid ~ Group, data = data_fram_cultivar)
+#Kruskal-Wallis chi-squared = 8.6151, df = 4, p-value = 0.07148
+
+#Decomposing group differences: If both PERMANOVA (tests for differences in centroids) and beta dispersion (tests for differences in variability) are significant, it suggests that groups differ not only in their average composition but also in their compositional spread. If only PERMANOVA is significant, the groups differ in their central tendency but have similar levels of variability. If only beta dispersion is significant, the groups have similar average compositions but differ in their
 ```
 
 
@@ -786,7 +802,7 @@ kruskal.test(Observed ~ Genotype, data = Bacterial_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Bacterial_Dunn_observed_genotype=dunn_test(Bacterial_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Bacterial_Dunn_observed_genotype
 write_csv(Bacterial_Dunn_observed_genotype, "Bacterial_Dunn_observed_genotype.csv")
 Bacterial_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Bacterial_Dunn_observed_genotype
@@ -816,7 +832,6 @@ kruskal.test(Shannon ~ Genotype, data = Bacterial_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
 Bacterial_Dunn_Shannon_genotype=dunn_test(Bacterial_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Bacterial_Dunn_Shannon_genotype
 write_csv(Bacterial_Dunn_Shannon_genotype, "Bacterial_Dunn_Shannon_genotype.csv")
 Bacterial_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Bacterial_Dunn_Shannon_genotype
@@ -873,7 +888,7 @@ kruskal.test(log10 ~ Genotype, data = Bacterial_Abundance)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Bacterial_Dunn_log10_genotype=dunn_test(Bacterial_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Bacterial_Dunn_log10_genotype
 write_csv(Bacterial_Dunn_log10_genotype, "Bacterial_Dunn_log10_genotype.csv")
 Bacterial_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Bacterial_Dunn_log10_genotype
@@ -1314,7 +1329,7 @@ save(ps3_Fungi, file = "/Users/expeditoolimi/Documents/Southampton/Tosin/African
 ## Ab-Prev prep
 ```{r}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
-
+library(grid)   # make sure grid::margin is active
 meta <- microbiome::meta(ps3_Fungi) # x_bac
 asv <- otu_table(ps3_Fungi) # x_bac
 taxo <- rownames_to_column(as.data.frame(tax_table(ps3_Fungi)),
@@ -1372,6 +1387,9 @@ asv_prev_rel_taxo_gen_obs <- merge(asv_prev_rel_taxo,
                                    asv_gen_obs, 
                                    by = "ASV")
 ```
+
+
+
 
 ## Ab-Prev Plot 
 ```{r}
@@ -1517,8 +1535,7 @@ Rareaction_Fungi <- Rareaction_Fungi + scale_color_manual(values = mycola) +
   theme(text=element_text(size=14,  family="sans"))+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
   theme(legend.position="none")+
-  labs(tag = "")
-print(Rareaction_Fungi)
+  labs(tag = "")+    expand_limits(x = 0, y = 0); Rareaction_Fungi
 
 tiff("p_Fungi.tiff", units="in", width=12, height=5, res=300)
 ggsave("p_Fungi.tiff", plot = Rareaction_Fungi)
@@ -1621,76 +1638,76 @@ head(df_Genus,20)
 
 
 
-#Computing the beta-diversity plots & stats
-#USING THE MicrobiotaProcess package
+#Beta diversity
 
-#https3_Fungi://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.htm
-#https3_Fungi://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html
-#library(MicrobiotaProcess)
-#Will consider the transformation by hellinger approach
-
-##Consider the cultivars
-```{r,echo=FALSE, warning=FALSE}
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
-library(MicrobiotaProcess)
-
-distme <- get_dist(ps3_Fungi, distmethod ="bray", method="hellinger");distme
-sampleda <- data.frame(sample_data(ps3_Fungi), check.names=FALSE);sampleda
-sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
-sampleda$Genotype <- factor(sampleda$Genotype)
-adores <- adonis2(distme ~ Genotype, 
-                  data=sampleda, 
-                  permutation=999);adores
-
-#           Df SumOfSqs   R2      F Pr(>F)    
-#Model     4   6.9505 0.76966   20.884  0.001 ***
-#Residual 25   2.0801 0.23034                  
-#Total    29   9.0306 1.00000                  
-#---
-#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-###################################################################################################
-# "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
-pcares <- get_pca(obj=ps3_Fungi, method="hellinger");pcares# for PCA ordination to show sample distribution
-pcoares <- get_pcoa(obj=ps3_Fungi, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
-
-##Plot PCoA considering the cultivars
-pcaplot1_fungi.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
-                       factorNames=c("Genotype"), ellips3_Fungie=F)+
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_fungi.tiff
-#ggsave("pcaplot1_fungi.tiff", plot = pcaplot1_fungi.tiff)
-# pc = c(1, 3) to show the first & third principal components.
-
-pcoaplot1_fungi.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
-                        factorNames=c("Genotype"), ellips3_Fungie=F) +
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, nrow=1))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_fungi.tiff
-#ggsave("pcoaplot1_fungi.tiff.TIFF", plot = pcoaplot1_fungi.tiff);pcoaplot1_fungi.tiff
-
-#Combine the figures
-tiff("PCOA_Fungi_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Fungi_cultitvars.tiff=pcaplot1_fungi.tiff+pcoaplot1_fungi.tiff+plot_layout(ncol = 2);PCOA_Fungi_cultitvars.tiff
-ggsave("PCOA_Fungi_cultitvars.tiff", plot = PCOA_Fungi_cultitvars.tiff)
-dev.off()
-
-###################################################################################################
+```{r}
+phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
+  # require(metagenomeSeq)
+  MGS <- phyloseq::phyloseq_to_metagenomeSeq(physeq)
+  # get the normalized count matrix
+  otu_norm <- metagenomeSeq::MRcounts(MGS, norm = norm, log = log, ...)
+  # exportMat(datt.norm, file = "tmp.txt")    # norm = TRUE, log = TRUE
+  ## save sample statistics (sample scaling factor, quantile value, number of identified features and library size):
+  # exportStats(dattM.sf, file = "tmp_stats.txt")
+  # Substitue raw abundance to the css-normalized data
+  physeq.tr <- physeq
+  phyloseq::otu_table(physeq.tr) <- phyloseq::otu_table(otu_norm, taxa_are_rows = T)
+  return(physeq.tr)
+}
 ```
+
+
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+ps3_Fungi_css = phyloseq_transform_css(ps3_Fungi);ps3_Fungi_css#########
+#First get otu_table and transpose it:
+dist.matrix_ps3_Fungi_css <- t(data.frame(otu_table(ps3_Fungi_css)))
+sampledf_ps3_Fungi_css <- data.frame(sample_data(ps3_Fungi_css))
+#Then use vegdist from vegan to generate a bray distance object:
+phyloseq_bray_ps3_Fungi_css <- vegdist(dist.matrix_ps3_Fungi_css, method = "bray"); phyloseq_bray_ps3_Fungi_css
+sampleda <- data.frame(sample_data(ps3_Fungi_css), check.names=FALSE);sampleda
+sampleda <- sampleda[match(colnames(as.matrix(phyloseq_bray_ps3_Fungi_css)),rownames(sampleda)),,drop=FALSE];sampleda
+sampleda$Sample_type <- factor(sampleda$Sample_type)
+adores <- adonis2(phyloseq_bray_ps3_Fungi_css ~ Genotype, data=sampleda, permutation=999);adores#change from adonis to adonis2
+#         Df SumOfSqs      R2      F Pr(>F)    
+#Model     4   4.9094 0.62459 10.399  0.001 ***
+#Residual 25   2.9508 0.37541                  
+#Total    29   7.8602 1.00000                  
+#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+#############################
+ps3_Fungi_css = phyloseq_transform_css(ps3_Fungi);ps3_Fungi_css#########
+#visualize
+matrixdistance_ps3_Fungi_css_PCoA <- ordinate(physeq = ps3_Fungi_css, method = "PCoA", distance = "bray", trymax = 1000)
+#Stress:     0.2069558 
+
+pcoaplot1_fungi.tiff=plot_ordination(physeq = ps3_Fungi_css, ordination = matrixdistance_ps3_Fungi_css_PCoA, color = "Genotype") + 
+  theme(text = element_text(size = 12)) + scale_color_manual(values =mycola)+theme(legend.title=element_blank())+  geom_point(aes(color =Genotype ), size = 5)+
+  scale_shape_manual(values=c(19,17, 15,18))+ theme_gray(base_size = 14)+ labs(tag = "D")+
+  theme(legend.position="");pcoaplot1_fungi.tiff
+tiff("pcoaplot1_fungi.tiff", units="in", width=5, height=5, res=300)
+ggsave("pcoaplot1_fungi.tiff", plot = pcoaplot1_fungi.tiff)
+dev.off()
+```
+
+
+
+#Beta dispersion tests & plot
+```{r}
+dist=phyloseq_bray_ps3_Fungi_css
+dispr <- vegan::betadisper(dist, phyloseq::sample_data(ps3_Fungi_css)$Genotype);dispr #calculate the dispersion
+
+data_fram_cultivar <- data.frame(Distance_to_centroid=dispr$distances,Group=dispr$group);data_fram_cultivar
+groups <- dispr$group
+
+#stats
+kruskal.test(Distance_to_centroid ~ Group, data = data_fram_cultivar)
+#Kruskal-Wallis chi-squared = 12.903, df = 4, p-value = 0.01176
+
+#Groups differ in both central tendency and variability (composition and spread)
+
+```
+
 
 
 #alpha diversity
@@ -1772,7 +1789,7 @@ kruskal.test(Observed ~ Genotype, data = Fungi_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Fungi_Dunn_observed_genotype=dunn_test(Fungi_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_observed_genotype
 write_csv(Fungi_Dunn_observed_genotype, "Fungi_Dunn_observed_genotype.csv")
 Fungi_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Fungi_Dunn_observed_genotype
@@ -1802,7 +1819,7 @@ kruskal.test(Shannon ~ Genotype, data = Fungi_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Fungi_Dunn_Shannon_genotype=dunn_test(Fungi_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungi_Dunn_Shannon_genotype
 write_csv(Fungi_Dunn_Shannon_genotype, "Fungi_Dunn_Shannon_genotype.csv")
 Fungi_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Fungi_Dunn_Shannon_genotype
@@ -1860,7 +1877,7 @@ kruskal.test(log10 ~ Genotype, data = Fungil_Abundance)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Fungil_Dunn_log10_genotype=dunn_test(Fungil_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Fungil_Dunn_log10_genotype
 write_csv(Fungil_Dunn_log10_genotype, "Fungil_Dunn_log10_genotype.csv")
 Fungil_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Fungil_Dunn_log10_genotype
@@ -2445,11 +2462,25 @@ library("networkD3")
 #sankey_pq(gp, taxa = c(1:5))
 #upset_pq(ps3_Archaea, "Genotype", taxa = "Genus")
 
+
 toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
 ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
 ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
-upset_Archaea_Order=upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Order");upset_Archaea_Order
+#dim(otu_table(ps.toptax_Archaea))
+#rank_names(ps.toptax_Archaea)
+#sample_variables(ps.toptax_Archaea)
+ps.toptax_Archaea <- prune_samples(sample_sums(ps.toptax_Archaea) > 0, ps.toptax_Archaea);ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(taxa_sums(ps.toptax_Archaea) > 0, ps.toptax_Archaea);ps.toptax_Archaea
 
+
+if (nsamples(ps.toptax_Archaea) > 0 && ntaxa(ps.toptax_Archaea) > 0) {
+  upset_Archaea_Order <- upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Order")
+} else {
+  message("No data available for Archaea at Order level.")
+}
+
+
+upset_Archaea_Order=upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Order");upset_Archaea_Order
 ggsave(
    "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Shared_upset_Archaea_Order.tiff",     
   plot = upset_Archaea_Order,
@@ -2474,9 +2505,29 @@ library("networkD3")
 #sankey_pq(gp, taxa = c(1:5))
 #upset_pq(ps3_Archaea, "Genotype", taxa = "Genus")
 
-toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:25];toptax
+toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
 ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
 ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
+
+
+
+toptax = names(sort(taxa_sums(ps3_Archaea), decreasing=TRUE))[1:100];toptax
+ps.toptax_Archaea = transform_sample_counts(ps3_Archaea, function(x) {x/sum(x)*100});ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(toptax, ps.toptax_Archaea);ps.toptax_Archaea
+#dim(otu_table(ps.toptax_Archaea))
+#rank_names(ps.toptax_Archaea)
+#sample_variables(ps.toptax_Archaea)
+ps.toptax_Archaea <- prune_samples(sample_sums(ps.toptax_Archaea) > 0, ps.toptax_Archaea);ps.toptax_Archaea
+ps.toptax_Archaea <- prune_taxa(taxa_sums(ps.toptax_Archaea) > 0, ps.toptax_Archaea);ps.toptax_Archaea
+
+
+if (nsamples(ps.toptax_Archaea) > 0 && ntaxa(ps.toptax_Archaea) > 0) {
+  upset_Archaea_Order <- upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Genus")
+} else {
+  message("No data available for Archaea at Order level.")
+}
+
+
 upset_Archaea_Genus=upset_pq(ps.toptax_Archaea, "Genotype", taxa = "Genus");upset_Archaea_Genus
 
 ggsave(
@@ -2519,8 +2570,7 @@ Rareaction_Archaea <- Rareaction_Archaea + scale_color_manual(values = mycola) +
   theme(text=element_text(size=14,  family="sans"))+
   guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=6))+
   theme(legend.position="none")+
-  labs(tag = "")
-print(Rareaction_Archaea)
+  labs(tag = "")+   expand_limits(x = 0, y = 0);Rareaction_Archaea
 
 tiff("p_Archaea.tiff", units="in", width=12, height=5, res=300)
 ggsave("p_Archaea.tiff", plot = Rareaction_Archaea)
@@ -2623,80 +2673,9 @@ head(df_Genus,20)
 ```
 
 
-
-#Computing the beta-diversity plots & stats
-#USING THE MicrobiotaProcess package
-
-#https3_Archaea://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.htm
-#https3_Archaea://yulab-smu.top/MicrobiotaProcessWorkshop/articles/MicrobiotaProcessWorkshop.html
-#library(MicrobiotaProcess)
-#Will consider the transformation by hellinger approach
-
-##Consider the cultivars
-```{r,echo=FALSE, warning=FALSE}
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
-ps3_Archaea <- prune_samples(sample_sums(ps3_Archaea) > 0, ps3_Archaea);ps3_Archaea
-library(MicrobiotaProcess)
-
-distme <- get_dist(ps3_Archaea, distmethod ="bray", method="hellinger",na.rm = TRUE);distme
-sampleda <- data.frame(sample_data(ps3_Archaea), check.names=FALSE);sampleda
-sampleda <- sampleda[match(colnames(as.matrix(distme)),rownames(sampleda)),,drop=FALSE];sampleda
-sampleda$Genotype <- factor(sampleda$Genotype)
-adores <- adonis2(distme ~ Genotype, 
-                  data=sampleda, 
-                  permutation=999);adores
-#         Df SumOfSqs      R2     F Pr(>F)  
-#Model     4   2.3954 0.24212 1.837  0.012 *
-#Residual 23   7.4980 0.75788               
-#Total    27   9.8934 1.00000               
-#Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-###################################################################################################
-# "unifrac", "wunifrac", "manhattan", "euclidean", "canberra", "bray", "kulczynski" ...(vegdist, dist)
-pcares <- get_pca(obj=ps3_Archaea, method="hellinger");pcares# for PCA ordination to show sample distribution
-pcoares <- get_pcoa(obj=ps3_Archaea, distmethod="bray", method="hellinger");pcoares#computes the pcoa distance matrices
-
-##Plot PCoA considering the cultivars
-pcaplot1_Archaea.tiff <- ggordpoint(obj=pcares, pc=c(1, 2), biplot=F, speciesannot=F,
-                       factorNames=c("Genotype"), ellips3_Archaeae=F)+
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=1))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcaplot1_Archaea.tiff
-#ggsave("pcaplot1_Archaea.tiff", plot = pcaplot1)
-# pc = c(1, 3) to show the first & third principal components.
-
-pcoaplot1_Archaea.tiff <- ggordpoint(obj=pcoares, biplot=F, speciesannot=F,
-                        factorNames=c("Genotype"), ellips3_Archaeae=F) +
-  scale_fill_manual(values=mycola)+
-  guides(fill= guide_legend(keywidth = 0.6, keyheight = 0.6, ncol=4))+
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_rect(colour = "black", size=1))+
-  theme(axis.text.x = element_text(size=12, face="bold", color = "black"),
-        axis.text.y = element_text(size=12, face="bold", color = "black"))+
-  theme(text=element_text(size=12,  family="sans"))+theme(legend.position = "")+
-  theme(legend.title=element_blank())+
-  theme(text=element_text(size=12,  family="sans"))+ labs(tag = "");pcoaplot1_Archaea.tiff
-#ggsave("pcoaplot1_Archaea.tiff.TIFF", plot = pcoaplot1_Archaea.tiff);pcoaplot1_Archaea.tiff
-
-#Combine the figures
-tiff("PCOA_Archaea_cultitvars.tiff", units="in", width=6, height=3, res=300)
-PCOA_Archaea_cultitvars.tiff=pcaplot1_Archaea.tiff+pcoaplot1_Archaea.tiff+plot_layout(ncol = 2);PCOA_Archaea_cultitvars.tiff
-ggsave("PCOA_Archaea_cultitvars.tiff", plot = PCOA_Archaea_cultitvars.tiff)
-dev.off()
-```
-
 #Beta diversity
 
 ```{r}
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
 phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
   # require(metagenomeSeq)
   MGS <- phyloseq::phyloseq_to_metagenomeSeq(physeq)
@@ -2713,29 +2692,65 @@ phyloseq_transform_css <- function(physeq, norm = TRUE, log = TRUE, ...){
 ```
 
 
-#beta diversity
 ```{r}
 load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+sample_sums(ps3_Archaea)
 ps3_Archaea <- prune_samples(sample_sums(ps3_Archaea) > 0, ps3_Archaea);ps3_Archaea
 ps3_Archaea_css = phyloseq_transform_css(ps3_Archaea);ps3_Archaea_css#########
 #First get otu_table and transpose it:
 dist.matrix_ps3_Archaea_css <- t(data.frame(otu_table(ps3_Archaea_css)))
 sampledf_ps3_Archaea_css <- data.frame(sample_data(ps3_Archaea_css))
 #Then use vegdist from vegan to generate a bray distance object:
-phyloseq_bray_ps3_Archaea_css <- vegdist(dist.matrix_ps3_Archaea_css, method = "bray",na.rm = TRUE); phyloseq_bray_ps3_Archaea_css
+phyloseq_bray_ps3_Archaea_css <- vegdist(dist.matrix_ps3_Archaea_css, method = "bray"); phyloseq_bray_ps3_Archaea_css
 sampleda <- data.frame(sample_data(ps3_Archaea_css), check.names=FALSE);sampleda
 sampleda <- sampleda[match(colnames(as.matrix(phyloseq_bray_ps3_Archaea_css)),rownames(sampleda)),,drop=FALSE];sampleda
-sampleda$Genotype <- factor(sampleda$Genotype)
-
-#         Df SumOfSqs      R2      F Pr(>F)  
-#Model     4   2.2618 0.23438 1.7603  0.019 *
+adores <- adonis2(phyloseq_bray_ps3_Archaea_css ~ Genotype, data=sampleda, permutation=999);adores#change from adonis to adonis2
+#Model     4   2.2618 0.23438 1.7603  0.012 *
 #Residual 23   7.3882 0.76562                
 #Total    27   9.6500 1.00000                
 #Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 #############################
+ps3_Archaea_css = phyloseq_transform_css(ps3_Archaea);ps3_Archaea_css#########
+#visualize
+matrixdistance_ps3_Archaea_css_PCoA <- ordinate(physeq = ps3_Archaea_css, method = "PCoA", distance = "bray", trymax = 1000)
+#Stress:     0.2069558 
+
+PCOA_Archaea_cultitvars.tiff=plot_ordination(physeq = ps3_Archaea_css, ordination = matrixdistance_ps3_Archaea_css_PCoA, color = "Genotype") + 
+  theme(text = element_text(size = 12)) + scale_color_manual(values =mycola)+theme(legend.title=element_blank())+  geom_point(aes(color =Genotype ), size = 5)+
+  scale_shape_manual(values=c(19,17, 15,18))+ theme_gray(base_size = 14)+ labs(tag = "E")+
+  theme(legend.position="");PCOA_Archaea_cultitvars.tiff
+tiff("PCOA_Archaea_cultitvars.tiff", units="in", width=6, height=3, res=300)
+ggsave("PCOA_Archaea_cultitvars.tiff", plot = PCOA_Archaea_cultitvars.tiff)
+dev.off()
+
+
+#Combine the figures
+library(patchwork)
+#tiff("Beta_bact_fung_arch.tiff", units="in", width=10, height=5, res=300)
+#Beta_bact_fung_arch.tiff=pcoaplot1_bacteria.tiff+pcoaplot1_fungi.tiff+PCOA_Archaea_cultitvars.tiff+plot_layout(nrow=1);Beta_bact_fung_arch.tiff
+#ggsave("Beta_bact_fung_arch.tiff", plot = Beta_bact_fung_arch.tiff)
+#dev.off()
+
+
 ```
 
 
+
+#Beta dispersion tests & plot
+```{r}
+dist=phyloseq_bray_ps3_Archaea_css
+dispr <- vegan::betadisper(dist, phyloseq::sample_data(ps3_Archaea_css)$Genotype);dispr #calculate the dispersion
+
+data_fram_cultivar <- data.frame(Distance_to_centroid=dispr$distances,Group=dispr$group);data_fram_cultivar
+groups <- dispr$group
+
+#stats
+kruskal.test(Distance_to_centroid ~ Group, data = data_fram_cultivar)
+#Kruskal-Wallis chi-squared = 7.508, df = 4, p-value = 0.1114
+
+#Groups differ in both central tendency and variability (composition and spread)
+
+```
 
 
 #alpha diversity
@@ -2817,7 +2832,7 @@ kruskal.test(Observed ~ Genotype, data = Archaea_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Archaeal_Dunn_observed_genotype=dunn_test(Archaea_richness, Observed ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_observed_genotype
 write_csv(Archaeal_Dunn_observed_genotype, "Archaeal_Dunn_observed_genotype.csv")
 Archaeal_Dunn_observed_genotype <- dunnTest(Observed, Genotype, method = "bonferroni");Archaeal_Dunn_observed_genotype
@@ -2846,7 +2861,7 @@ kruskal.test(Shannon ~ Genotype, data = Archaea_richness)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Archaeal_Dunn_Shannon_genotype=dunn_test(Archaea_richness, Shannon ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaeal_Dunn_Shannon_genotype
 write_csv(Archaeal_Dunn_Shannon_genotype, "Archaeal_Dunn_Shannon_genotype.csv")
 Archaeal_Dunn_Shannon_genotype <- dunnTest(Shannon, Genotype, method = "bonferroni");Archaeal_Dunn_Shannon_genotype
@@ -2901,7 +2916,7 @@ kruskal.test(log10 ~ Genotype, data = Archaea_Abundance)
 
 #Post-hoc (Dunn's tests)
 
-# Region of tomato seed production
+
 Archaea_Dunn_log10_genotype=dunn_test(Archaea_Abundance, log10 ~ Genotype, p.adjust.method = "bonferroni", detailed = FALSE);Archaea_Dunn_log10_genotype
 write_csv(Archaea_Dunn_log10_genotype, "Archaea_Dunn_log10_genotype.csv")
 Archaea_Dunn_log10_genotype <- dunnTest(log10, Genotype, method = "bonferroni");Archaea_Dunn_log10_genotype
@@ -3189,10 +3204,18 @@ Figures combined
 #Rarefaction
 ```{r}
 setwd("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome")
+Rarefaction.tiff <- Rarefaction_Bacteria + Rareaction_Fungi + Rareaction_Archaea +
+  plot_layout(nrow = 1, byrow = FALSE)
 
-tiff("Rarefaction.tiff", units="in", width=9, height=3.5, res=300)
-Rarefaction.tiff=(Rareaction_Bacteria+Rareaction_Fungi+Rareaction_Archaea+plot_layout(nrow = 1, byrow = FALSE));Rarefaction.tiff
-dev.off()
+ggsave(
+  "Rarefaction.tiff",
+  plot = Rarefaction.tiff,
+  device = "tiff",
+  width = 9,
+  height = 3.5,
+  units = "in",
+  dpi = 300
+)
 ```
 
 
@@ -3483,7 +3506,7 @@ otutable[1:4,]
 write.table(otutable, "faprotax.taxon.table.tsv", sep = "\t", quote=FALSE)
 ```
 
-
+#https://mgaley-004.github.io/MiSeq-Analysis/Tutorials/faprotax_demo.html
 #Run FAPROTAX
 #FAPROTAX is a command line utility that relys on having python 3 installed on your system. I personally have had dependency problems running FAPROTAX with python 3.9 and recommend using python 3.7.
 
@@ -3494,7 +3517,7 @@ write.table(otutable, "faprotax.taxon.table.tsv", sep = "\t", quote=FALSE)
 ```{r}
 #./collapse_table.py -i faprotax.taxon.table.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
 
-If you are running Windows:
+#If you are running Windows:
 #python collapse_table.py -i faprotax.taxon.table.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
 ```
 
@@ -3527,7 +3550,10 @@ If you are running Windows:
 
 
 ```{r}
-otu.function.table <- read.table("FAPROTAX_1.2.10/out.functable.tsv", sep="\t", header=TRUE, row.names=1);otu.function.table
+otu.function.table <- read.csv("FAPROTAX_1.2.10/out.functable.csv",
+              header=TRUE,
+              row.names=1);otu.function.table
+#otu.function.table <- read.table("FAPROTAX_1.2.10/out.functable.tsv", sep="\t", header=TRUE, row.names=1);otu.function.table
 
 #Discard functions identified in fewer than 10 reads
 otu.function.table <- otu.function.table[which(rowSums(otu.function.table) > 10),]
@@ -3540,111 +3566,469 @@ otu.function.table[1:4,1:4]
 ```{r}
 #Check how many functions were identified
 dim(otu.function.table)
-```
 
-
-```{r}
 #This normalizes the read counts to the total function identifications for each samples. An imperfect solution since FAPROTAX most likely did not assign a function to all of your OTUS. To check FAPROTAX's performance, read the report file.
 
 rel.otu.fn.table <- apply(otu.function.table,MARGIN = 2, FUN = function(x) x/sum(x))
 
-rel.otu.fn.df <- data.frame(rel.otu.fn.table)
-rel.otu.fn.df
+rel.otu.fn.df <- data.frame(rel.otu.fn.table);rel.otu.fn.df
 ```
 
 
 
-#Microeco package
-```{r,echo=FALSE,warning=FALSE}
-load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Bacteria.RData")
-
-mt=phyloseq2meco(ps3_Bacteria);mt
-#phy=meco2phyloseq(mt);phy # microeco to phyloseq
-class(mt$otu_table)
-class(mt$tax_table)
-class(mt$sample_table)
-class(mt$phylo_tree)
-#convert the microeco object
-mt=microtable$new(sample_table = mt$sample_table, otu_table = mt$otu_table, tax_table = mt$tax_table);mt
-class(mt)
-mt$sample_table
-#The trans_env & trans_func classes are placed into the section ‘Explainable class’, as environmental factors & microbial functions can be generally applied to explain microbial community structure & assembly.
-
-## Imported metadata file
-#env_data <- read.table("env_data.txt", header=TRUE, sep="\t",row.names="SampleID");env_data
-
-#mt$sample_table <- data.frame(mt$sample_table, env_data[rownames(mt$sample_table), ])
-#mt$sample_table
-#alternatively create another dataframe & append to the microeco object
-#t1 <- trans_env$new(dataset = mt, add_data = env_data[, 1:12]);t1 
-#t1$data_env
-
+#Load metadata
+```{r}
+sampledata = read.csv("FAPROTAX_1.2.10/Bacteria_metadata.csv", row.names=1, header=TRUE);sampledata
+#Convert the results dataframe into a longform dataframe (melt it).
 ```
-#trans_func class
-#Ecological researchers are usually interested in the the funtional profiles of microbial communities, because functional or metabolic data is powerful to explain the structure & dynamics of microbial communities. As metagenomic sequencing is complicated & expensive, using amplicon sequencing data to predict functional profiles is an alternative choice. Several software are often used for this goal, such as PICRUSt (Langille et al. 2013), Tax4Fun (Aßhauer et al. 2015) & FAPROTAX (Stilianos Louca et al. 2016; S. Louca, Parfrey, & Doebeli 2016). These tools are great to be used for the prediction of functional profiles based on the prokaryotic communities from sequencing results. In addition, it is also important to obtain the traits or functions for each taxa, not just the whole profile of communities. FAPROTAX database is a collection of the traits & functions of prokaryotes based on the known research results published in books & literatures. We match the taxonomic information of prokaryotes against this database to predict the traits of prokaryotes on biogeochemical roles. The NJC19 database (Lim et al. 2020) is also available for animal-associated prokaryotic data, such as human gut microbiota. We also implement the FUNGuild (Nguyen et al. 2016) & FungalTraits (Põlme et al. 2020) databases to predict the fungal traits. The idea identifying prokaryotic traits & functional redundancy was initially inspired by our another study (C. Liu et al. 2022).
-```{r,echo=FALSE,warning=FALSE}
-t1 <- trans_func$new(mt)
-t1$sample_table
-t1$cal_spe_func(prok_database = "FAPROTAX")
-t1$cal_spe_func_perc(abundance_weighted = TRUE)
-# it is better to clone a dataset
-tmp_mt <- clone(mt);tmp_mt
-# transpose res_spe_func_perc to be a data.frame like taxonomic abundance
-tmp <- as.data.frame(t(t1$res_spe_func_perc), check.names = FALSE);tmp
-# assign the table back to taxa_abund list for further analysis
-tmp_mt$taxa_abund$func <- tmp
-# select the "func" in taxa_abund list in trans_diff
-t2 <- trans_diff$new(dataset = tmp_mt, method = "anova", group = "Genotype", taxa_level = "func");t2
 
-Relative_bacterial_func=t2$plot_diff_abund(add_sig = T) + ggplot2::ylab("Relative abundance (%)");Relative_bacterial_func
+
+
+#Convert the results dataframe into a longform dataframe (melt it).
+```{r}
+#Make row names a column
+rel.otu.fn.df$BioFunction = row.names(rel.otu.fn.df)
+rel.otu.fn.df$BioFunction
+#melt
+library(data.table)
+
+# convert to data.table
+otu.melt <- melt(setDT(rel.otu.fn.df), id.vars = "BioFunction");otu.melt
+#otu.melt <- melt(rel.otu.fn.df, id.vars = "BioFunction")
+
+#make this a sparse dataframe
+otu.s.melt <- otu.melt[which(otu.melt$value > 0),];otu.s.melt
+```
+
+# Pull relevant metadata and add to the melted dataframe.
+```{r}
+
+colnames(otu.s.melt) <- c("BioFunction", "variable", "value")
+otu.s.melt$Genotype <- sampledata[as.vector(otu.s.melt$variable),"Genotype"]
+otu.s.melt$Sample_type <- sampledata[as.vector(otu.s.melt$variable),"Sample_type"]
+otu.s.melt$target <- sampledata[as.vector(otu.s.melt$variable),"target"]
+otu.s.melt$Barcode_system <- sampledata[as.vector(otu.s.melt$variable),"Barcode_system"]
+#otu.s.melt$SA_code <- sampledata[as.vector(otu.s.melt$variable),"SA_code"]
+#otu.s.melt$wr.dens.cat <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.cat"]
+#otu.s.melt$wr.dens.scale <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.scale"]
+
+otu.s.melt[1:10,]
+```
+
+#The Problem
+```{r}
+theme_set(theme_classic(base_size=12))
+
+Relative_bacterial_func=ggplot(otu.s.melt[which(otu.s.melt$value >= 0.005),], aes(x=Genotype, y=value, fill=BioFunction)) + geom_bar(stat="identity", position="fill") + scale_fill_manual(values=c(mycolors, "pink"));Relative_bacterial_func
 
 ggsave(
    "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Relative_bacterial_func.tiff",     
   plot = Relative_bacterial_func,
    scale = 1,
- width = 25,
-  height = 20,
+ width = 11,
+  height = 9,
   units = c("cm"),
  dpi = 600)
 
-t2$trans_spe_func_perc()
-t2$plot_spe_func_perc()
+```
+
+#All this kind of chart can tell us about is how frequently OTUs were assigned a function out of all possible assignments. It’s important to remember that FAPROTAX does not create a compositional dataset! OTUs are assigned to multiple categories. One obvious example is that ‘aerobic chemoheterotrophs’ are necessarily ‘chemoheterotrophs’, so the fact that the blue and gray bars take up most of the space in the chart together is really misleading. Many of the other assignments also overlap. For example, many of the identified nitrate reducing bacteria also happen to be iron respiring bacteria and chemoheterotrophs.
+
+#That is why stacked bar charts and any kind of chart that implies a compositional set are inappropriate for this kind of data.
+
+
+#Solution: Relative Scaling
+#This will not solve the bar chart problem, but will help to make the data itself more interpretable. Instead of normalizing the count values to the sum of the faprotax table, normalize them to the total read depth.
+
+
+
+```{r}
+#rel.otu.fn.table <- sapply(colnames(otu.function.table), function(x) otu.function.table[,x]/raw.depth[x]);rel.otu.fn.table
+
+raw.depth <- colSums(otu.function.table);raw.depth
+rel.otu.fn.table <- sweep(otu.function.table, 2, raw.depth, "/");rel.otu.fn.table
+
+rel.otu.fn.df <- data.frame(rel.otu.fn.table);rel.otu.fn.df
+row.names(rel.otu.fn.df) <- row.names(otu.function.table)
+
+rel.otu.fn.df[1:10,1:4]
+```
+
+#melt the data again
+```{r}
+rel.otu.fn.df$BioFunction = row.names(rel.otu.fn.df)
+#melt
+library(data.table)
+
+# convert to data.table
+otu.melt <- melt(setDT(rel.otu.fn.df), id.vars = "BioFunction");otu.melt
+#otu.melt <- melt(rel.otu.fn.df, id.vars = "BioFunction")
+
+#make this a sparse dataframe
+otu.s.melt <- otu.melt[which(otu.melt$value > 0),];otu.s.melt
 ```
 
 
-#Network
-```{r}
-# construct a network for the example
-network <- trans_network$new(dataset = mt, cal_cor = "base", taxa_level = "OTU", filter_thres = 0.0001, cor_method = "spearman");network
-network$cal_network(p_thres = 0.05, COR_cut = 0.7)
-network$cal_module()
-# convert module info to microtable object
-meco_module <- network$trans_comm(use_col = "module")
-meco_module_func <- trans_func$new(meco_module)
-meco_module_func$cal_spe_func(prok_database = "FAPROTAX")
-meco_module_func$cal_spe_func_perc(abundance_weighted = FALSE)
-Network_bacterial_func=meco_module_func$plot_spe_func_perc(order_x = paste0("M", 1:10));Network_bacterial_func
 
- ggsave(
-   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Network_bacterial_func.tiff",     
-  plot = Network_bacterial_func,
+```{r}
+colnames(otu.s.melt) <- c("BioFunction", "variable", "value")
+otu.s.melt$Genotype <- sampledata[as.vector(otu.s.melt$variable),"Genotype"]
+otu.s.melt$Sample_type <- sampledata[as.vector(otu.s.melt$variable),"Sample_type"]
+otu.s.melt$target <- sampledata[as.vector(otu.s.melt$variable),"target"]
+otu.s.melt$Barcode_system <- sampledata[as.vector(otu.s.melt$variable),"Barcode_system"]
+#otu.s.melt$SA_code <- sampledata[as.vector(otu.s.melt$variable),"SA_code"]
+#otu.s.melt$wr.dens.cat <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.cat"]
+#otu.s.melt$wr.dens.scale <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.scale"]
+
+otu.s.melt[1:10,]
+
+```
+
+
+
+#Visualization
+```{r}
+otu.s.melt$BioFunction <- as.factor(otu.s.melt$BioFunction)
+
+#Optionally, abbreviate the long names of the FAPROTAX functions to make your charts more readable. 
+
+otu.s.melt$ShortFunction <- otu.s.melt$BioFunction
+#levels(otu.s.melt$ShortFunction) <- c("ONH3O", "OCHT", "ONO3O", "ANMHD", "APSY", "AOPHAT", "AOPHATS", "ARCD", "ARHD", "CELL", "CHT", "CHIT", "CLRE", "CYAN", "DH2O", "DFEO", "DSCO", "DSO", "DENI", "FERM", "FURE", "HUAS", "HUGU", "HUPA", "HCDE", "INPA", "FERE", "MAGU", "CHO", "CHT", "CHLT", "NO3DE", "NO3RE", "NO3RS", "NO2F", "NO2DEN", "NO2RS", "N2FX", "N2RS", "NODEN", "OPHAT", "PHAT", "PHHT", "PHT", "PRED", "REDACT", "SCRES", "SO4RES", "SO3RES", "SRES", "TSRES", "UREO")
+```
+
+
+
+#Heat maps! They don’t imply a composition and also let you off the hook for picking colors.
+```{r}
+# Choose a smaller font size
+theme_set(theme_classic(base_size=8))
+
+sorted.melt <- otu.s.melt
+faprotax_bysample=ggplot(sorted.melt[which(sorted.melt$value >= 0.02),], aes(x=variable, y=tolower(ShortFunction), fill=value)) + geom_tile() + scale_fill_viridis_c(limits=c(0,0.3)) + theme(axis.text.x = element_blank()) + ylab("FAPROTAX Function") + facet_wrap(~Genotype, scales = "free_x");faprotax_bysample
+```
+
+#Save your work!
+```{r}
+ggsave("faprotax_bysample.tiff",width=7, height=5, units="in", dpi=300) 
+```
+
+
+
+
+
+
+
+
+#Archaea community
+#load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Archaea.RData")
+#object=ps3_Archaea
+taxdf = data.frame(tax_table(ps3_Archaea))
+taxdf[1:4,1:4]
+colnames(taxdf) <- c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus")
+
+#FAPROTAX wants one string with all the column names.
+taxdf$taxstring = paste(taxdf$Kingdom, taxdf$Phylum, taxdf$Class, taxdf$Order, taxdf$Family, taxdf$Genus, sep="; ")
+taxdf[1:4,]
+
+#We’re now appending the taxonomy string as a column to the otu table. Save the otu table as a .tsv file and tell R to use a tab character as the separater. Quotes around the values will break FAPROTAX.
+otutable=data.frame(otu_table(ps3_Archaea));otutable
+otutable$taxonomy = taxdf[as.vector(row.names(otutable)),"taxstring"]
+otutable[1:4,]
+
+write.table(otutable, "faprotax.taxon.table.archaea.tsv", sep = "\t", quote=FALSE)
+```
+
+
+#Run FAPROTAX
+#FAPROTAX is a command line utility that relys on having python 3 installed on your system. I personally have had dependency problems running FAPROTAX with python 3.9 and recommend using python 3.7.
+
+#In terminal or a shell of your choice, navigate to the directory where you have downloaded and unpacked FAPROTAX. Handy reminders on UNIX vs MsDOS file system navigation.
+
+#If you are running MacOS or a Linux based OS:
+
+```{r}
+#./collapse_table.py -i faprotax.taxon.table.archaea.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
+
+#If you are running Windows:
+#python collapse_table.py -i faprotax.taxon.table.archaea.tsv -o out.functable.tsv -g FAPROTAX.txt -c '#' -d taxonomy --omit_columns 0 --column_names_are_in last_comment_line -r out.report.txt -v -s out_subtables/ -f
+```
+
+
+
+#You may recieve many messages warning you that ‘is’ != ==, but don’t worry. It’s working.
+
+#An explanation of all of the flags we used:
+
+#./collapse_table.py or python collapse_table.py runs the main faprotax program
+#-i faprotax.taxon.table.archaea.tsv this is the argument for the name of your input file.
+#-o out.functable.tsv this is the argument for the name of the output file you want.
+#-g FAPROTAX.txt this is the name of the faprotax database. don’t change this.
+#-c ‘#’ this tells faprotax that ‘#’ is the comment character. don’t change.
+#-d taxonomy this tells faprotax to look for taxonomy information in the column named ‘taxonomy’. you would only change this if you changed the name of the column in the R code.
+#–omit_columns 0 this tells faprotax to ignore the first column, which is just OTU names.
+#–column_names_are_in_last_comment_line this tells faprotax where the sample names are. don’t change.
+#-r out.report.txt this gives faprotax the name for the report file to create.
+#-v this makes visible output on your screen while faprotax is working. I find it reassuring.
+#-s out_subtables/ this tells faprotax to separate out and save otu_tables for each functional groups and store them in a folder called out_subtables. You don’t need to make that folder first, faprotax will do it for you.
+#-f this is optional. It tells faprotax that it’s okay to overwrite filenames. I put this in there when I was troubleshooting this script and didn’t want to keep making new file names.
+#You can read additional documentation on how to run FAPROTAX on their website.
+
+
+#FAPROTAX results
+#Broad patterns
+#First we’ll look at the major functions FAPROTAX identified in the samples regardless of taxonomy.
+
+#You must remove the comment symbol from the first line of the results tsv for the following to work.
+
+
+```{r}
+otu.function.table <- read.csv("FAPROTAX_1.2.10/out.functable.arc.csv",
+              header=TRUE,
+              row.names=1);otu.function.table
+#otu.function.table <- read.table("FAPROTAX_1.2.10/out.functable.tsv", sep="\t", header=TRUE, row.names=1);otu.function.table
+
+#Discard functions identified in fewer than 10 reads
+otu.function.table <- otu.function.table[which(rowSums(otu.function.table) > 10),]
+#Discard samples where no functions were identified
+otu.function.table <- otu.function.table[,which(colSums(otu.function.table) > 1)]
+otu.function.table[1:4,1:4]
+```
+
+
+```{r}
+#Check how many functions were identified
+dim(otu.function.table)
+
+#This normalizes the read counts to the total function identifications for each samples. An imperfect solution since FAPROTAX most likely did not assign a function to all of your OTUS. To check FAPROTAX's performance, read the report file.
+
+rel.otu.fn.table <- apply(otu.function.table,MARGIN = 2, FUN = function(x) x/sum(x))
+
+rel.otu.fn.df <- data.frame(rel.otu.fn.table);rel.otu.fn.df
+```
+
+
+
+#Load metadata
+```{r}
+sampledata = read.csv("FAPROTAX_1.2.10/Archaea_Metadata.csv", row.names=1, header=TRUE);sampledata
+#Convert the results dataframe into a longform dataframe (melt it).
+```
+
+
+
+#Convert the results dataframe into a longform dataframe (melt it).
+```{r}
+#Make row names a column
+rel.otu.fn.df$BioFunction = row.names(rel.otu.fn.df)
+rel.otu.fn.df$BioFunction
+#melt
+library(data.table)
+
+# convert to data.table
+otu.melt <- melt(setDT(rel.otu.fn.df), id.vars = "BioFunction");otu.melt
+#otu.melt <- melt(rel.otu.fn.df, id.vars = "BioFunction")
+
+#make this a sparse dataframe
+otu.s.melt <- otu.melt[which(otu.melt$value > 0),];otu.s.melt
+```
+
+# Pull relevant metadata and add to the melted dataframe.
+```{r}
+
+colnames(otu.s.melt) <- c("BioFunction", "variable", "value")
+otu.s.melt$Genotype <- sampledata[as.vector(otu.s.melt$variable),"Genotype"]
+otu.s.melt$Sample_type <- sampledata[as.vector(otu.s.melt$variable),"Sample_type"]
+otu.s.melt$target <- sampledata[as.vector(otu.s.melt$variable),"target"]
+otu.s.melt$Barcode_system <- sampledata[as.vector(otu.s.melt$variable),"Barcode_system"]
+#otu.s.melt$SA_code <- sampledata[as.vector(otu.s.melt$variable),"SA_code"]
+#otu.s.melt$wr.dens.cat <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.cat"]
+#otu.s.melt$wr.dens.scale <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.scale"]
+
+otu.s.melt[1:10,]
+```
+
+#The Problem
+```{r}
+theme_set(theme_classic(base_size=12))
+
+Relative_archaeal_func=ggplot(otu.s.melt[which(otu.s.melt$value >= 0.005),], aes(x=Genotype, y=value, fill=BioFunction)) + geom_bar(stat="identity", position="fill") + scale_fill_manual(values=c(mycolors, "pink"));Relative_archaeal_func
+
+ggsave(
+   "/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/Relative_archaeal_func.tiff",     
+  plot = Relative_archaeal_func,
    scale = 1,
- width = 25,
-  height = 20,
+ width = 13,
+  height = 9,
   units = c("cm"),
  dpi = 600)
- 
- 
- 
- # If you want to change the group list, reset the list t2$func_group_list
-meco_module_func$func_group_list
-# use show_prok_func to see the detailed information of prokaryotic traits
-meco_module_func$show_prok_func("methanotrophy")
+
+```
+
+#All this kind of chart can tell us about is how frequently OTUs were assigned a function out of all possible assignments. It’s important to remember that FAPROTAX does not create a compositional dataset! OTUs are assigned to multiple categories. One obvious example is that ‘aerobic chemoheterotrophs’ are necessarily ‘chemoheterotrophs’, so the fact that the blue and gray bars take up most of the space in the chart together is really misleading. Many of the other assignments also overlap. For example, many of the identified nitrate reducing bacteria also happen to be iron respiring bacteria and chemoheterotrophs.
+
+#That is why stacked bar charts and any kind of chart that implies a compositional set are inappropriate for this kind of data.
+
+
+#Solution: Relative Scaling
+#This will not solve the bar chart problem, but will help to make the data itself more interpretable. Instead of normalizing the count values to the sum of the faprotax table, normalize them to the total read depth.
+
+
+
+```{r}
+#rel.otu.fn.table <- sapply(colnames(otu.function.table), function(x) otu.function.table[,x]/raw.depth[x]);rel.otu.fn.table
+
+raw.depth <- colSums(otu.function.table);raw.depth
+rel.otu.fn.table <- sweep(otu.function.table, 2, raw.depth, "/");rel.otu.fn.table
+
+rel.otu.fn.df <- data.frame(rel.otu.fn.table);rel.otu.fn.df
+row.names(rel.otu.fn.df) <- row.names(otu.function.table)
+
+rel.otu.fn.df[1:10,1:4]
+```
+
+#melt the data again
+```{r}
+rel.otu.fn.df$BioFunction = row.names(rel.otu.fn.df)
+#melt
+library(data.table)
+
+# convert to data.table
+otu.melt <- melt(setDT(rel.otu.fn.df), id.vars = "BioFunction");otu.melt
+#otu.melt <- melt(rel.otu.fn.df, id.vars = "BioFunction")
+
+#make this a sparse dataframe
+otu.s.melt <- otu.melt[which(otu.melt$value > 0),];otu.s.melt
 ```
 
 
 
 ```{r}
+colnames(otu.s.melt) <- c("BioFunction", "variable", "value")
+otu.s.melt$Genotype <- sampledata[as.vector(otu.s.melt$variable),"Genotype"]
+otu.s.melt$Sample_type <- sampledata[as.vector(otu.s.melt$variable),"Sample_type"]
+otu.s.melt$target <- sampledata[as.vector(otu.s.melt$variable),"target"]
+otu.s.melt$Barcode_system <- sampledata[as.vector(otu.s.melt$variable),"Barcode_system"]
+#otu.s.melt$SA_code <- sampledata[as.vector(otu.s.melt$variable),"SA_code"]
+#otu.s.melt$wr.dens.cat <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.cat"]
+#otu.s.melt$wr.dens.scale <- sampledata[as.vector(otu.s.melt$variable),"wr.dens.scale"]
+
+otu.s.melt[1:10,]
 
 ```
+
+
+
+#Visualization
+```{r}
+otu.s.melt$BioFunction <- as.factor(otu.s.melt$BioFunction)
+
+#Optionally, abbreviate the long names of the FAPROTAX functions to make your charts more readable. 
+
+otu.s.melt$ShortFunction <- otu.s.melt$BioFunction
+#levels(otu.s.melt$ShortFunction) <- c("ONH3O", "OCHT", "ONO3O", "ANMHD", "APSY", "AOPHAT", "AOPHATS", "ARCD", "ARHD", "CELL", "CHT", "CHIT", "CLRE", "CYAN", "DH2O", "DFEO", "DSCO", "DSO", "DENI", "FERM", "FURE", "HUAS", "HUGU", "HUPA", "HCDE", "INPA", "FERE", "MAGU", "CHO", "CHT", "CHLT", "NO3DE", "NO3RE", "NO3RS", "NO2F", "NO2DEN", "NO2RS", "N2FX", "N2RS", "NODEN", "OPHAT", "PHAT", "PHHT", "PHT", "PRED", "REDACT", "SCRES", "SO4RES", "SO3RES", "SRES", "TSRES", "UREO")
+```
+
+
+
+#Heat maps! They don’t imply a composition and also let you off the hook for picking colors.
+```{r}
+# Choose a smaller font size
+theme_set(theme_classic(base_size=8))
+
+sorted.melt <- otu.s.melt
+faprotax_bysample.archaeal=ggplot(sorted.melt[which(sorted.melt$value >= 0.02),], aes(x=variable, y=tolower(ShortFunction), fill=value)) + geom_tile() + scale_fill_viridis_c(limits=c(0,0.3)) + theme(axis.text.x = element_blank()) + ylab("FAPROTAX Function") + facet_wrap(~Genotype, scales = "free_x");faprotax_bysample.archaeal
+```
+
+#Save your work!
+```{r}
+ggsave("faprotax_bysample.archaeal.tiff",width=7, height=5, units="in", dpi=300) 
+```
+
+
+
+
+
+#Fungal community
+#Assign ecological guilds / functions
+#Works with taxonomy (usually genus or species level).
+#Matches taxa against a curated database of fungal lifestyles (e.g., Saprotroph, Pathotroph, Symbiotroph).
+```{r}
+load("/Users/expeditoolimi/Documents/Southampton/Tosin/African-seed-microbiome/ps3_Fungi.RData")
+devtools::install_github("brendanf/FUNGuildR")
+
+# Convert phyloseq to dataframe
+taxonomy <- as.data.frame(tax_table(ps3_Fungi));taxonomy
+
+
+# Match by genus or species
+annotated <- taxonomy %>%
+  left_join(traits, by = c("Species" = "Taxon"))
+
+```
+
+# Assigning Functional Guilds o terminal
+
+```{r}
+#Use -h or --help for a detail FUNGuild manual.
+
+##Preparing your workspace:
+
+#git clone https://github.com/UMNFuN/FUNGuild
+#cd FUNGuild/
+#Run the script using default parameters:
+
+#python Guilds_v1.0.py -otu /Users/username/Documents/project/otu_table.txt -db fungi
+```
+
+#Then reaf the assigned functions
+
+```{r}
+# pseudocode - depends on package you install
+df <- read.delim("FUNGuild/Fungi_Table.guilds.txt",, header = TRUE, sep = "\t", stringsAsFactors = FALSE);df
+library(dplyr)
+library(tidyr)
+library(readr)
+
+# Step 1: Filter by confidence
+df_filtered <- df %>%
+  filter(Confidence_Ranking %in% c("Probable", "Highly Probable"))
+
+# Step 2: Identify sample columns
+sample_cols <- grep("^f_[A-E][1-6]$", colnames(df_filtered), value = TRUE)
+
+# Step 3: Pivot longer
+df_long <- df_filtered %>%
+  select(all_of(c("Guild", sample_cols))) %>%
+  pivot_longer(
+    cols = all_of(sample_cols),
+    names_to = "Sample",
+    values_to = "Abundance"
+  )
+
+# Step 4: Summarize by Sample and Guild
+guild_summary <- df_long %>%
+  group_by(Sample, Guild) %>%
+  summarise(Total_Abundance = sum(Abundance, na.rm = TRUE), .groups = "drop")
+
+# Step 5: Inspect result
+head(guild_summary)
+
+
+```
+
+
+
+# Gather sample columns into long format
+```{r}
+library(ggplot2)
+ggplot(guild_summary, aes(x = Sample, y = Total_Abundance, fill = Guild)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Fungal Guild Composition by Sample", x = "Sample", y = "Total Abundance")
+
+```
+
 
