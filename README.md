@@ -10,6 +10,14 @@ This research project investigates the microbial communities associated with Afr
 - Functional profiling of microbial communities
 - Statistical comparisons between genotypes and conditions
 
+## Authors
+
+Oluwatosin Ajibade, Expedito Olimi, Wisnu Adi Wicaksono, Elijah Kolawole Oladipo, Julius. K. Oloke, Olubukola Monisola Oyawoye, Tomislav Cernava, Gabriele Berg
+
+## Abstract
+
+The seed microbiome is essential for plant health, development, and adaptation. This study investigates the microbial communities associated with African seeds, focusing on bacteria, archaea, and fungi in five Nigerian vegetable crops (Amaranthus hybridus, Solanum macrocarpon, Corchorus olitorius, Celosia argentea, and Telfairia occidentalis). The findings reveal diverse microbial communities, with plant species-specific seed microbial signatures for bacterial and fungal communities. The core seed microbiota includes potentially plant-beneficial taxa like Methanobrevibacter, Methylobacterium, Burkholderia-Caballeronia-Paraburkholderia, Bacillus, Paenibacillus, Stenotrophomonas, Pseudomonas, Serratia, Pantoea, Shingomonas, Lactobacillus, Aspergillus, and Fusarium. Random forest classification successfully resolved plant species-specific differences. The research highlights the importance of these microbial communities for plant sustenance in smallholder-dependent food production systems and provides a basis for conserving unique plant genetic resources.
+
 ## Repository Contents
 
 ### Analysis Scripts
