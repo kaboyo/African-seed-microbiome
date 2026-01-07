@@ -1,0 +1,11 @@
+.y.,group1,group2,n1,n2,statistic,p,p.adj,p.adj.signif
+Distance_to_centroid,Amaranthus_hybridus,Celosiea_argentea,6,6,0.8197822947299415,0.4123402260838688,1,ns
+Distance_to_centroid,Amaranthus_hybridus,Corchorus_olitorius,6,6,2.2625991334546383,0.023660411602735524,0.23660411602735523,ns
+Distance_to_centroid,Amaranthus_hybridus,Solanum_macrocarpon,6,6,-0.262330334313581,0.7930667772875877,1,ns
+Distance_to_centroid,Amaranthus_hybridus,Telfairia_occidentalis,6,6,1.4428168387246967,0.14907207441279638,1,ns
+Distance_to_centroid,Celosiea_argentea,Corchorus_olitorius,6,6,1.4428168387246967,0.14907207441279638,1,ns
+Distance_to_centroid,Celosiea_argentea,Solanum_macrocarpon,6,6,-1.0821126290435226,0.27920248481136706,1,ns
+Distance_to_centroid,Celosiea_argentea,Telfairia_occidentalis,6,6,0.6230345439947552,0.5332618217904681,1,ns
+Distance_to_centroid,Corchorus_olitorius,Solanum_macrocarpon,6,6,-2.5249294677682195,0.011572151222483694,0.11572151222483694,ns
+Distance_to_centroid,Corchorus_olitorius,Telfairia_occidentalis,6,6,-0.8197822947299415,0.4123402260838688,1,ns
+Distance_to_centroid,Solanum_macrocarpon,Telfairia_occidentalis,6,6,1.7051471730382777,0.08816697953973031,0.8816697953973031,ns
